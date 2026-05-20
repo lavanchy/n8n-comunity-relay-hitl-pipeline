@@ -1,0 +1,9 @@
+{
+  "__comment": "n8n Workflow JSON — wird via Claude Code generiert und dann hier eingecheckt. Alle Credential-IDs als {{PLACEHOLDER}} belassen.",
+  "name": "Relay HITL Content Pipeline",
+  "nodes": [],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
