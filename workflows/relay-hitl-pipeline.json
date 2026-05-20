@@ -227,7 +227,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const d = $input.first().json;\nconst ctx = $('Parse Sofia Output').first().json;\n\nconst decision = d.sofia_decision || d.data?.sofia_decision || d.response?.sofia_decision || '';\nconst notes = d.sofia_notes || d.data?.sofia_notes || d.response?.sofia_notes || '';\n\nreturn [{ json: { ...ctx, sofia_decision: decision, sofia_notes: notes } }];"
+        "jsCode": "const d = $input.first().json;\nconst ctx = $('Parse Sofia Output').first().json;\n\n// gotoHuman v2: field values are in responseValues.FIELD.value\nconst rv = d.responseValues || {};\nconst decision = rv.sofia_decision?.value || d.sofia_decision || '';\nconst notes    = rv.sofia_notes?.value    || d.sofia_notes    || '';\n\nreturn [{ json: { ...ctx, sofia_decision: decision, sofia_notes: notes } }];"
       },
       "id": "00000000-0000-0000-0000-000000000009",
       "name": "Process Sofia Decision",
@@ -244,17 +244,25 @@
           "options": {
             "caseSensitive": false,
             "leftValue": "",
-            "typeValidation": "loose",
-            "version": 1
+            "typeValidation": "loose"
           },
           "conditions": [
             {
-              "id": "sofia-approve-check",
+              "id": "sofia-not-revise",
               "leftValue": "={{ $json.sofia_decision }}",
-              "rightValue": "Approve",
+              "rightValue": "revise",
               "operator": {
                 "type": "string",
-                "operation": "startsWith"
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "sofia-not-empty",
+              "leftValue": "={{ $json.sofia_decision }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
               }
             }
           ],
@@ -273,7 +281,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const d = $input.first().json;\nconst decision = d.sofia_decision || '';\nlet approved_angle = decision.replace(/^Approve:?\\s*/i, '').trim();\nif (!approved_angle) approved_angle = (d.sofia_angles || '').split('\\n')[0];\nreturn [{ json: { ...d, approved_angle, sofia_feedback: '' } }];"
+        "jsCode": "const d = $input.first().json;\nconst decision = d.sofia_decision || '';\n\n// Map gotoHuman option IDs (angle1/2/3) to angle number\nlet angleNum = 0;\nconst m = decision.match(/(\\d)/);\nif (m) angleNum = parseInt(m[1]);\n\n// Extract chosen angle block from sofia_angles\nconst blocks = (d.sofia_angles || '').split(/\\*\\*Angle \\d+:/);\nlet approved_angle = '';\nif (angleNum > 0 && blocks[angleNum]) {\n  approved_angle = ('**Angle ' + angleNum + ':' + blocks[angleNum]).trim();\n} else {\n  approved_angle = (d.sofia_angles || '').split('\\n')[0] || decision;\n}\n\nreturn [{ json: { ...d, approved_angle, sofia_feedback: '' } }];"
       },
       "id": "00000000-0000-0000-0000-000000000012",
       "name": "Set Approved Angle",
@@ -421,7 +429,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const d = $input.first().json;\nconst ctx = $('Format Taylor Preview').first().json;\n\nconst decision = d.marcus_decision || d.data?.marcus_decision || d.response?.marcus_decision || '';\nconst notes = d.marcus_notes || d.data?.marcus_notes || d.response?.marcus_notes || '';\n\nreturn [{ json: { ...ctx, marcus_decision: decision, marcus_notes: notes } }];"
+        "jsCode": "const d = $input.first().json;\nconst ctx = $('Format Taylor Preview').first().json;\n\nconst rv = d.responseValues || {};\nconst decision = rv.marcus_decision?.value || d.marcus_decision || '';\nconst notes    = rv.marcus_notes?.value    || d.marcus_notes    || '';\n\nreturn [{ json: { ...ctx, marcus_decision: decision, marcus_notes: notes } }];"
       },
       "id": "00000000-0000-0000-0000-000000000020",
       "name": "Process Marcus Decision",
@@ -438,17 +446,17 @@
           "options": {
             "caseSensitive": false,
             "leftValue": "",
-            "typeValidation": "loose",
-            "version": 1
+            "typeValidation": "loose"
           },
           "conditions": [
             {
-              "id": "marcus-send-check",
+              "id": "marcus-not-edit",
               "leftValue": "={{ $json.marcus_decision }}",
-              "rightValue": "Send to Taylor",
+              "rightValue": "edit|regenerate|revise",
               "operator": {
                 "type": "string",
-                "operation": "equals"
+                "operation": "not",
+                "rightType": "regex"
               }
             }
           ],
@@ -554,7 +562,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const d = $input.first().json;\nconst ctx = $('Parse Taylor Analysis').first().json;\n\nconst decision = d.taylor_decision || d.data?.taylor_decision || d.response?.taylor_decision || '';\nconst notes = d.taylor_notes || d.data?.taylor_notes || d.response?.taylor_notes || '';\nconst round = (ctx.taylor_approval_round || 0) + 1;\n\nreturn [{ json: { ...ctx, taylor_decision: decision, taylor_notes: notes, taylor_approval_round: round } }];"
+        "jsCode": "const d = $input.first().json;\nconst ctx = $('Parse Taylor Analysis').first().json;\n\nconst rv = d.responseValues || {};\nconst decision = rv.taylor_decision?.value || d.taylor_decision || '';\nconst notes    = rv.taylor_notes?.value    || d.taylor_notes    || '';\nconst round    = (ctx.taylor_approval_round || 0) + 1;\n\nreturn [{ json: { ...ctx, taylor_decision: decision, taylor_notes: notes, taylor_approval_round: round } }];"
       },
       "id": "00000000-0000-0000-0000-000000000028",
       "name": "Process Taylor Decision",
@@ -575,20 +583,14 @@
                   {
                     "id": "t-approve",
                     "leftValue": "={{ $json.taylor_decision }}",
-                    "rightValue": "Approve",
+                    "rightValue": "approve",
                     "operator": {
                       "type": "string",
-                      "operation": "equals"
+                      "operation": "contains"
                     }
                   }
                 ],
-                "combinator": "and",
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 1
-                }
+                "combinator": "and"
               },
               "renameOutput": true,
               "outputKey": "Approve"
@@ -599,20 +601,14 @@
                   {
                     "id": "t-marcus",
                     "leftValue": "={{ $json.taylor_decision }}",
-                    "rightValue": "Back to Marcus",
+                    "rightValue": "marcus",
                     "operator": {
                       "type": "string",
-                      "operation": "equals"
+                      "operation": "contains"
                     }
                   }
                 ],
-                "combinator": "and",
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 1
-                }
+                "combinator": "and"
               },
               "renameOutput": true,
               "outputKey": "Back to Marcus"
@@ -623,20 +619,14 @@
                   {
                     "id": "t-sofia",
                     "leftValue": "={{ $json.taylor_decision }}",
-                    "rightValue": "Back to Sofia",
+                    "rightValue": "sofia",
                     "operator": {
                       "type": "string",
-                      "operation": "equals"
+                      "operation": "contains"
                     }
                   }
                 ],
-                "combinator": "and",
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 1
-                }
+                "combinator": "and"
               },
               "renameOutput": true,
               "outputKey": "Back to Sofia"
