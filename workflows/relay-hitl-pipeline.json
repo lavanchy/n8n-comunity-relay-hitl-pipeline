@@ -2,6 +2,58 @@
   "name": "Relay HITL Content Pipeline",
   "nodes": [
     {
+      "id": "00000000-0000-0000-0000-000000000033",
+      "name": "Note: Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-80, 160],
+      "parameters": {
+        "content": "## Setup\nIntake Form → Kontext laden → State initialisieren",
+        "height": 360,
+        "width": 680,
+        "color": 2
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000034",
+      "name": "Note: Sofia",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [680, 60],
+      "parameters": {
+        "content": "## Sofia – Content Strategist\nGeneriert 3 Content-Angles (Brand Guide + Platform Playbook).\nReview: Angle 1/2/3 auswählen oder Revision anfordern. Max. 3 Revisionen.",
+        "height": 680,
+        "width": 1980,
+        "color": 4
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000035",
+      "name": "Note: Marcus",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-80, 820],
+      "parameters": {
+        "content": "## Marcus – Creative\nSchreibt Post Copy + Image Direction für den genehmigten Angle.\nErstellt Taylor Preview (AI-Vorschau) vor dem Human Review.\nReview: \"Send to Taylor\" oder \"Edit & Regenerate\". Max. 3 Revisionen.",
+        "height": 620,
+        "width": 2380,
+        "color": 6
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000036",
+      "name": "Note: Taylor",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-80, 1440],
+      "parameters": {
+        "content": "## Taylor – Quality Control\nFinale KI-Analyse + Human Review des fertigen Posts.\nEntscheid: Approve → Google Sheets | Back to Marcus | Back to Sofia.",
+        "height": 740,
+        "width": 1960,
+        "color": 3
+      }
+    },
+    {
       "id": "00000000-0000-0000-0000-000000000001",
       "name": "Intake Form",
       "type": "n8n-nodes-base.formTrigger",
@@ -28,7 +80,7 @@
       "name": "Load Client Context",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [220, 300],
+      "position": [240, 300],
       "parameters": {
         "mode": "manual",
         "fields": {
@@ -51,7 +103,7 @@
       "name": "Init State",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [440, 300],
+      "position": [480, 300],
       "parameters": {
         "mode": "runOnceForAllItems",
         "jsCode": "const d = $input.first().json;\nreturn [{ json: {\n  ...d,\n  iterations_sofia: 0,\n  iterations_marcus: 0,\n  sofia_feedback: '',\n  marcus_feedback: '',\n  approved_angle: '',\n  post_copy: '',\n  image_direction: '',\n  taylor_approval_round: 0\n}}];"
@@ -62,7 +114,7 @@
       "name": "Sofia Loop Entry",
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
-      "position": [660, 300],
+      "position": [720, 300],
       "parameters": {"mode": "chooseBranch", "options": {}}
     },
     {
@@ -70,7 +122,7 @@
       "name": "Build Sofia Prompt",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [880, 300],
+      "position": [960, 300],
       "parameters": {
         "mode": "runOnceForAllItems",
         "jsCode": "const d = $input.first().json;\nconst feedbackSection = d.sofia_feedback\n  ? `\\nPrevious reviewer feedback to address:\\n${d.sofia_feedback}\\n`\n  : '';\n\nconst prompt = `You are Sofia, a content strategy researcher at Relay.\\n\\nClient: ${d.client_name}\\nPlatform: ${d.platform}\\nContent Type: ${d.content_type}\\nTopic Hint: ${d.topic_hint}\\nTone Note: ${d.tone_note}\\n\\n### Brand Context\\n${d.brand_guide}\\n\\n### Platform Context\\n${d.platform_playbook}\\n${feedbackSection}\\nTask: Generate exactly 3 content angle options. Each angle must:\\n1. Be specific and tailored to ${d.platform} audience\\n2. Reference the brand voice and key messages from Loopin\\n3. Include a clear rationale explaining why it fits\\n4. Avoid generic startup clichés\\n\\nFormat response as:\\n**Angle 1: [Title]**\\n[1-2 sentence rationale]\\n\\n**Angle 2: [Title]**\\n[1-2 sentence rationale]\\n\\n**Angle 3: [Title]**\\n[1-2 sentence rationale]`;\n\nreturn [{ json: { ...d, sofia_prompt: prompt } }];"
@@ -81,7 +133,7 @@
       "name": "Sofia AI",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1100, 300],
+      "position": [1200, 300],
       "parameters": {
         "method": "POST",
         "url": "https://api.anthropic.com/v1/messages",
@@ -101,7 +153,7 @@
       "name": "Parse Sofia Output",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1320, 300],
+      "position": [1440, 300],
       "parameters": {
         "mode": "runOnceForAllItems",
         "jsCode": "const apiResp = $input.first().json;\nconst ctx = $('Build Sofia Prompt').first().json;\nconst sofia_angles = apiResp.content?.[0]?.text || '';\nreturn [{ json: { ...ctx, sofia_angles } }];"
@@ -112,7 +164,7 @@
       "name": "Sofia Review",
       "type": "n8n-nodes-gotohuman.gotoHuman",
       "typeVersion": 1,
-      "position": [1540, 300],
+      "position": [1680, 300],
       "parameters": {
         "formType": "{{SOFIA_TEMPLATE_ID}}",
         "fieldsUi": {
@@ -131,10 +183,10 @@
       "name": "Process Sofia Decision",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1760, 300],
+      "position": [1920, 300],
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "const d = $input.first().json;\nconst ctx = $('Parse Sofia Output').first().json;\n\n// gotoHuman returns fields at top level or nested under data/response\nconst decision = d.sofia_decision || d.data?.sofia_decision || d.response?.sofia_decision || '';\nconst notes = d.sofia_notes || d.data?.sofia_notes || d.response?.sofia_notes || '';\n\nreturn [{ json: { ...ctx, sofia_decision: decision, sofia_notes: notes } }];"
+        "jsCode": "const d = $input.first().json;\nconst ctx = $('Parse Sofia Output').first().json;\n\nconst decision = d.sofia_decision || d.data?.sofia_decision || d.response?.sofia_decision || '';\nconst notes = d.sofia_notes || d.data?.sofia_notes || d.response?.sofia_notes || '';\n\nreturn [{ json: { ...ctx, sofia_decision: decision, sofia_notes: notes } }];"
       }
     },
     {
@@ -142,7 +194,7 @@
       "name": "Route Sofia Decision",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
-      "position": [1980, 300],
+      "position": [2160, 300],
       "parameters": {
         "conditions": {
           "options": {"caseSensitive": false, "leftValue": "", "typeValidation": "loose"},
@@ -153,25 +205,25 @@
       }
     },
     {
-      "id": "00000000-0000-0000-0000-000000000011",
-      "name": "Inc Sofia Counter",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [2200, 480],
-      "parameters": {
-        "mode": "runOnceForAllItems",
-        "jsCode": "const d = $input.first().json;\nif ((d.iterations_sofia || 0) >= 3) {\n  throw new Error('Sofia revision limit (3) reached. Manual intervention required.');\n}\nreturn [{ json: {\n  ...d,\n  iterations_sofia: (d.iterations_sofia || 0) + 1,\n  sofia_feedback: d.sofia_notes || ''\n}}];"
-      }
-    },
-    {
       "id": "00000000-0000-0000-0000-000000000012",
       "name": "Set Approved Angle",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2200, 120],
+      "position": [2400, 100],
       "parameters": {
         "mode": "runOnceForAllItems",
         "jsCode": "const d = $input.first().json;\nconst decision = d.sofia_decision || '';\nlet approved_angle = decision.replace(/^Approve:?\\s*/i, '').trim();\nif (!approved_angle) approved_angle = (d.sofia_angles || '').split('\\n')[0];\nreturn [{ json: { ...d, approved_angle, sofia_feedback: '' } }];"
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000011",
+      "name": "Inc Sofia Counter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2400, 500],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const d = $input.first().json;\nif ((d.iterations_sofia || 0) >= 3) {\n  throw new Error('Sofia revision limit (3) reached. Manual intervention required.');\n}\nreturn [{ json: {\n  ...d,\n  iterations_sofia: (d.iterations_sofia || 0) + 1,\n  sofia_feedback: d.sofia_notes || ''\n}}];"
       }
     },
     {
@@ -179,7 +231,7 @@
       "name": "Marcus Loop Entry",
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
-      "position": [2420, 120],
+      "position": [0, 1000],
       "parameters": {"mode": "chooseBranch", "options": {}}
     },
     {
@@ -187,7 +239,7 @@
       "name": "Build Marcus Prompt",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2640, 120],
+      "position": [240, 1000],
       "parameters": {
         "mode": "runOnceForAllItems",
         "jsCode": "const d = $input.first().json;\nconst feedbackSection = d.marcus_feedback\n  ? `\\nPrevious feedback to incorporate:\\n${d.marcus_feedback}\\n`\n  : '';\nconst platformLimits = {\n  'LinkedIn': '800-1500 characters',\n  'X (Twitter)': 'max 280 characters (single tweet) or 3-7 tweet thread',\n  'Instagram': '200-400 character caption'\n};\nconst charLimit = platformLimits[d.platform] || '800-1200 characters';\n\nconst prompt = `You are Marcus, a creative at Relay.\\n\\nApproved Angle: ${d.approved_angle}\\nPlatform: ${d.platform}\\nContent Type: ${d.content_type}\\nTone: ${d.tone_note}\\n\\n### Brand Context\\n${d.brand_guide}\\n\\n### Platform Context\\n${d.platform_playbook}\\n${feedbackSection}\\nTask: Create a social media post for ${d.platform} based on the approved angle.\\n\\n**Post Copy Requirements:**\\n- Length: ${charLimit}\\n- Hook first\\n- Tone: ${d.tone_note}\\n- Loopin voice: clear, direct, human, practical, confident\\n- End with ONE CTA\\n\\n**Image Direction Requirements:**\\n- Be specific (not 'create an image' - describe exactly what to show)\\n- Reference Loopin brand colors (#5B4AE8 primary, #00D9C8 accent)\\n- For Instagram: describe each carousel slide individually\\n- For LinkedIn: describe screenshot, stat graphic, or photo\\n- For X: optional - only describe if it adds value\\n\\nFormat response EXACTLY as:\\n**Post Copy:**\\n[copy here]\\n\\n**Image Direction:**\\n[specific visual description]`;\n\nreturn [{ json: { ...d, marcus_prompt: prompt } }];"
@@ -198,7 +250,7 @@
       "name": "Marcus AI",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2860, 120],
+      "position": [480, 1000],
       "parameters": {
         "method": "POST",
         "url": "https://api.anthropic.com/v1/messages",
@@ -218,7 +270,7 @@
       "name": "Parse Marcus Output",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [3080, 120],
+      "position": [720, 1000],
       "parameters": {
         "mode": "runOnceForAllItems",
         "jsCode": "const apiResp = $input.first().json;\nconst ctx = $('Build Marcus Prompt').first().json;\nconst rawText = apiResp.content?.[0]?.text || '';\n\nconst copyMatch = rawText.match(/\\*\\*Post Copy:\\*\\*\\s*([\\s\\S]*?)(?=\\*\\*Image Direction:\\*\\*|$)/i);\nconst imgMatch = rawText.match(/\\*\\*Image Direction:\\*\\*\\s*([\\s\\S]*?)$/i);\n\nconst post_copy = copyMatch ? copyMatch[1].trim() : rawText;\nconst image_direction = imgMatch ? imgMatch[1].trim() : '(See post copy)';\n\nreturn [{ json: { ...ctx, post_copy, image_direction } }];"
@@ -229,7 +281,7 @@
       "name": "Taylor Preview Call",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [3300, 120],
+      "position": [960, 1000],
       "parameters": {
         "method": "POST",
         "url": "https://api.anthropic.com/v1/messages",
@@ -249,7 +301,7 @@
       "name": "Format Taylor Preview",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [3520, 120],
+      "position": [1200, 1000],
       "parameters": {
         "mode": "runOnceForAllItems",
         "jsCode": "const apiResp = $input.first().json;\nconst ctx = $('Parse Marcus Output').first().json;\nlet preview;\ntry {\n  const raw = (apiResp.content?.[0]?.text || '{}').replace(/```json\\n?/g,'').replace(/```\\n?/g,'').trim();\n  preview = JSON.parse(raw);\n} catch(e) {\n  preview = { summary: '(Preview unavailable)', quality_flags: [], recommendation: 'needs_review', reasoning: 'Parse error' };\n}\n\nconst flags = preview.quality_flags?.length > 0\n  ? preview.quality_flags.map(f => `- ${f}`).join('\\n')\n  : '- No flags identified';\n\nconst taylor_preview_md = `**Taylor Preview (AI)**\\n\\n**Summary:** ${preview.summary}\\n\\n**Quality Flags:**\\n${flags}\\n\\n**Recommendation:** ${preview.recommendation}\\n**Reasoning:** ${preview.reasoning}`;\n\nreturn [{ json: { ...ctx, taylor_preview_md, taylor_preview_json: preview } }];"
@@ -260,7 +312,7 @@
       "name": "Marcus Review",
       "type": "n8n-nodes-gotohuman.gotoHuman",
       "typeVersion": 1,
-      "position": [3740, 120],
+      "position": [1440, 1000],
       "parameters": {
         "formType": "{{MARCUS_TEMPLATE_ID}}",
         "fieldsUi": {
@@ -279,7 +331,7 @@
       "name": "Process Marcus Decision",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [3960, 120],
+      "position": [1680, 1000],
       "parameters": {
         "mode": "runOnceForAllItems",
         "jsCode": "const d = $input.first().json;\nconst ctx = $('Format Taylor Preview').first().json;\n\nconst decision = d.marcus_decision || d.data?.marcus_decision || d.response?.marcus_decision || '';\nconst notes = d.marcus_notes || d.data?.marcus_notes || d.response?.marcus_notes || '';\n\nreturn [{ json: { ...ctx, marcus_decision: decision, marcus_notes: notes } }];"
@@ -290,7 +342,7 @@
       "name": "Route Marcus Decision",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
-      "position": [4180, 120],
+      "position": [1920, 1000],
       "parameters": {
         "conditions": {
           "options": {"caseSensitive": false, "leftValue": "", "typeValidation": "loose"},
@@ -305,7 +357,7 @@
       "name": "Inc Marcus Counter",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [4400, 300],
+      "position": [2160, 1200],
       "parameters": {
         "mode": "runOnceForAllItems",
         "jsCode": "const d = $input.first().json;\nif ((d.iterations_marcus || 0) >= 3) {\n  throw new Error('Marcus revision limit (3) reached. Manual intervention required.');\n}\nreturn [{ json: {\n  ...d,\n  iterations_marcus: (d.iterations_marcus || 0) + 1,\n  marcus_feedback: d.marcus_notes || ''\n}}];"
@@ -316,7 +368,7 @@
       "name": "Taylor Loop Entry",
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
-      "position": [4400, 120],
+      "position": [0, 1700],
       "parameters": {"mode": "chooseBranch", "options": {}}
     },
     {
@@ -324,7 +376,7 @@
       "name": "Build Taylor Prompt",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [4620, 120],
+      "position": [240, 1700],
       "parameters": {
         "mode": "runOnceForAllItems",
         "jsCode": "const d = $input.first().json;\nconst prompt = `You are Taylor, final QC reviewer at Relay.\\n\\nOriginal Brief: ${d.topic_hint}\\nPlatform: ${d.platform}\\n\\n### Brand Context\\n${d.brand_guide}\\n\\n### Platform Context\\n${d.platform_playbook}\\n\\nPost Copy:\\n${d.post_copy}\\n\\nImage Direction:\\n${d.image_direction}\\n\\nTask: Review the post for quality, brand fit, and platform compliance.\\n\\nProvide:\\n1. **Summary** (2-3 sentences describing what the post says)\\n2. **Quality Flags** (list issues: tone misalignment, spec violations, brand inconsistency, generic messaging)\\n3. **AI Recommendation** (approve | needs_revision | reject_to_sofia)\\n4. **Brief reasoning** (1 sentence why)\\n\\nBe strict on brand fit. Posts should feel written specifically for Loopin, not generic SaaS copy.`;\n\nreturn [{ json: { ...d, taylor_prompt: prompt } }];"
@@ -335,7 +387,7 @@
       "name": "Taylor AI",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [4840, 120],
+      "position": [480, 1700],
       "parameters": {
         "method": "POST",
         "url": "https://api.anthropic.com/v1/messages",
@@ -355,7 +407,7 @@
       "name": "Parse Taylor Analysis",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [5060, 120],
+      "position": [720, 1700],
       "parameters": {
         "mode": "runOnceForAllItems",
         "jsCode": "const apiResp = $input.first().json;\nconst ctx = $('Build Taylor Prompt').first().json;\nconst rawText = apiResp.content?.[0]?.text || '';\n\nconst summaryMatch = rawText.match(/\\*\\*Summary\\*\\*[:\\s]*([\\s\\S]*?)(?=\\*\\*Quality Flags|$)/i);\nconst flagsMatch = rawText.match(/\\*\\*Quality Flags\\*\\*[:\\s]*([\\s\\S]*?)(?=\\*\\*AI Recommendation|$)/i);\nconst recMatch = rawText.match(/\\*\\*AI Recommendation\\*\\*[:\\s]*(approve|needs_revision|reject_to_sofia)/i);\nconst reasonMatch = rawText.match(/\\*\\*Brief reasoning\\*\\*[:\\s]*([\\s\\S]*?)$/i);\n\nreturn [{ json: {\n  ...ctx,\n  ai_summary: summaryMatch ? summaryMatch[1].trim() : rawText,\n  ai_flags: flagsMatch ? flagsMatch[1].trim() : '',\n  ai_recommendation: recMatch ? recMatch[1].trim() : 'needs_revision',\n  ai_reasoning: reasonMatch ? reasonMatch[1].trim() : ''\n}}];"
@@ -366,7 +418,7 @@
       "name": "Taylor Review",
       "type": "n8n-nodes-gotohuman.gotoHuman",
       "typeVersion": 1,
-      "position": [5280, 120],
+      "position": [960, 1700],
       "parameters": {
         "formType": "{{TAYLOR_TEMPLATE_ID}}",
         "fieldsUi": {
@@ -387,7 +439,7 @@
       "name": "Process Taylor Decision",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [5500, 120],
+      "position": [1200, 1700],
       "parameters": {
         "mode": "runOnceForAllItems",
         "jsCode": "const d = $input.first().json;\nconst ctx = $('Parse Taylor Analysis').first().json;\n\nconst decision = d.taylor_decision || d.data?.taylor_decision || d.response?.taylor_decision || '';\nconst notes = d.taylor_notes || d.data?.taylor_notes || d.response?.taylor_notes || '';\nconst round = (ctx.taylor_approval_round || 0) + 1;\n\nreturn [{ json: { ...ctx, taylor_decision: decision, taylor_notes: notes, taylor_approval_round: round } }];"
@@ -398,7 +450,7 @@
       "name": "Route Taylor Decision",
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
-      "position": [5720, 120],
+      "position": [1440, 1700],
       "parameters": {
         "mode": "rules",
         "rules": {
@@ -417,7 +469,7 @@
       "name": "Log to Google Sheets",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
-      "position": [5940, 0],
+      "position": [1680, 1540],
       "parameters": {
         "operation": "append",
         "documentId": {"__rl": true, "value": "1Nhxi8wQPS2aOcVEkLnjqNTG7tWUAhgTpRVXBOvET_0Y", "mode": "id"},
@@ -449,7 +501,7 @@
       "name": "Prep Back To Marcus",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [5940, 200],
+      "position": [1680, 1700],
       "parameters": {
         "mode": "runOnceForAllItems",
         "jsCode": "const d = $input.first().json;\nreturn [{ json: {\n  ...d,\n  marcus_feedback: `Taylor review feedback:\\n${d.taylor_notes || ''}`,\n  iterations_marcus: (d.iterations_marcus || 0) + 1\n}}];"
@@ -460,7 +512,7 @@
       "name": "Prep Back To Sofia",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [5940, 360],
+      "position": [1680, 1860],
       "parameters": {
         "mode": "runOnceForAllItems",
         "jsCode": "const d = $input.first().json;\nreturn [{ json: {\n  ...d,\n  sofia_feedback: `Quality concern from Taylor:\\n${d.taylor_notes || ''}`,\n  iterations_sofia: (d.iterations_sofia || 0) + 1,\n  marcus_feedback: ''\n}}];"
