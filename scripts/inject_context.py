@@ -70,12 +70,13 @@ def main():
 
     # Substitute credential/template placeholders throughout
     substitutions = {
-        "{{ANTHROPIC_CRED_ID}}":       env.get("ANTHROPIC_CRED_ID", "REPLACE"),
-        "{{GOTOHUMAN_CRED_ID}}":       env.get("GOTOHUMAN_CRED_ID", "REPLACE"),
-        "{{GOOGLE_SHEETS_CRED_ID}}":   env.get("GOOGLE_SHEETS_CRED_ID", "REPLACE"),
-        "{{SOFIA_TEMPLATE_ID}}":       env.get("SOFIA_TEMPLATE_ID", "REPLACE"),
-        "{{MARCUS_TEMPLATE_ID}}":      env.get("MARCUS_TEMPLATE_ID", "REPLACE"),
-        "{{TAYLOR_TEMPLATE_ID}}":      env.get("TAYLOR_TEMPLATE_ID", "REPLACE"),
+        "{{ANTHROPIC_CRED_ID}}":             env.get("ANTHROPIC_CRED_ID", "REPLACE"),
+        "{{GOTOHUMAN_CRED_ID}}":             env.get("GOTOHUMAN_CRED_ID", "REPLACE"),
+        "{{GOOGLE_SHEETS_CRED_ID}}":         env.get("GOOGLE_SHEETS_CRED_ID", "REPLACE"),
+        "{{GOOGLE_SHEETS_SPREADSHEET_ID}}":  env.get("GOOGLE_SHEETS_SPREADSHEET_ID", "REPLACE"),
+        "{{SOFIA_TEMPLATE_ID}}":             env.get("SOFIA_TEMPLATE_ID", "REPLACE"),
+        "{{MARCUS_TEMPLATE_ID}}":            env.get("MARCUS_TEMPLATE_ID", "REPLACE"),
+        "{{TAYLOR_TEMPLATE_ID}}":            env.get("TAYLOR_TEMPLATE_ID", "REPLACE"),
     }
     wf = substitute_placeholders(wf, substitutions)
 
