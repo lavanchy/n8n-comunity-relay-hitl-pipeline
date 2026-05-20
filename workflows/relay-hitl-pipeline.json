@@ -2,478 +2,715 @@
   "name": "Relay HITL Content Pipeline",
   "nodes": [
     {
-      "id": "00000000-0000-0000-0000-000000000033",
-      "name": "Note: Setup",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [-80, 160],
       "parameters": {
         "content": "## Setup\nIntake Form → Kontext laden → State initialisieren",
         "height": 360,
         "width": 680,
         "color": 2
-      }
+      },
+      "id": "00000000-0000-0000-0000-000000000033",
+      "name": "Note: Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        160
+      ]
     },
     {
+      "parameters": {
+        "content": "## Sofia – Content Strategist\nGeneriert 3 Content-Angles (Brand Guide + Platform Playbook).\nReview: Angle 1/2/3 auswählen oder Revision anfordern. Max. 3 Revisionen.",
+        "height": 680,
+        "width": 2036,
+        "color": 4
+      },
       "id": "00000000-0000-0000-0000-000000000034",
       "name": "Note: Sofia",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [680, 60],
-      "parameters": {
-        "content": "## Sofia – Content Strategist\nGeneriert 3 Content-Angles (Brand Guide + Platform Playbook).\nReview: Angle 1/2/3 auswählen oder Revision anfordern. Max. 3 Revisionen.",
-        "height": 680,
-        "width": 1980,
-        "color": 4
-      }
+      "position": [
+        1104,
+        48
+      ]
     },
     {
+      "parameters": {
+        "content": "## Marcus – Creative\nSchreibt Post Copy + Image Direction für den genehmigten Angle.\nErstellt Taylor Preview (AI-Vorschau) vor dem Human Review.\nReview: \"Send to Taylor\" oder \"Edit & Regenerate\". Max. 3 Revisionen.",
+        "height": 620,
+        "width": 2580,
+        "color": 6
+      },
       "id": "00000000-0000-0000-0000-000000000035",
       "name": "Note: Marcus",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [-80, 820],
-      "parameters": {
-        "content": "## Marcus – Creative\nSchreibt Post Copy + Image Direction für den genehmigten Angle.\nErstellt Taylor Preview (AI-Vorschau) vor dem Human Review.\nReview: \"Send to Taylor\" oder \"Edit & Regenerate\". Max. 3 Revisionen.",
-        "height": 620,
-        "width": 2380,
-        "color": 6
-      }
+      "position": [
+        320,
+        768
+      ]
     },
     {
+      "parameters": {
+        "content": "## Taylor – Quality Control\nFinale KI-Analyse + Human Review des fertigen Posts.\nEntscheid: Approve → Google Sheets | Back to Marcus | Back to Sofia.",
+        "height": 740,
+        "width": 2084,
+        "color": 3
+      },
       "id": "00000000-0000-0000-0000-000000000036",
       "name": "Note: Taylor",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [-80, 1440],
-      "parameters": {
-        "content": "## Taylor – Quality Control\nFinale KI-Analyse + Human Review des fertigen Posts.\nEntscheid: Approve → Google Sheets | Back to Marcus | Back to Sofia.",
-        "height": 740,
-        "width": 1960,
-        "color": 3
-      }
+      "position": [
+        336,
+        1440
+      ]
     },
     {
-      "id": "00000000-0000-0000-0000-000000000001",
-      "name": "Intake Form",
-      "type": "n8n-nodes-base.formTrigger",
-      "typeVersion": 2.2,
-      "position": [0, 300],
-      "webhookId": "relay-hitl-intake",
       "parameters": {
         "formTitle": "Relay Content Brief",
         "formDescription": "Submit a new content brief to the HITL pipeline (Sofia → Marcus → Taylor)",
         "formFields": {
           "values": [
-            {"fieldLabel": "Client", "fieldType": "text", "fieldId": "client", "requiredField": true, "placeholder": "e.g. Loopin"},
-            {"fieldLabel": "Platform", "fieldType": "dropdown", "fieldId": "platform", "requiredField": true, "fieldOptions": {"values": [{"option": "LinkedIn"}, {"option": "X (Twitter)"}, {"option": "Instagram"}]}},
-            {"fieldLabel": "Content Type", "fieldType": "text", "fieldId": "content_type", "requiredField": true, "placeholder": "e.g. Product announcement, Thought leadership, Culture post"},
-            {"fieldLabel": "Topic Hint", "fieldType": "textarea", "fieldId": "topic_hint", "requiredField": true},
-            {"fieldLabel": "Tone Note", "fieldType": "textarea", "fieldId": "tone_note", "requiredField": false, "placeholder": "e.g. Founder voice, direct, not corporate"}
+            {
+              "fieldLabel": "Client",
+              "placeholder": "e.g. Loopin",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Platform",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "LinkedIn"
+                  },
+                  {
+                    "option": "X (Twitter)"
+                  },
+                  {
+                    "option": "Instagram"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Content Type",
+              "placeholder": "e.g. Product announcement, Thought leadership, Culture post",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Topic Hint",
+              "fieldType": "textarea",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Tone Note",
+              "fieldType": "textarea",
+              "placeholder": "e.g. Founder voice, direct, not corporate"
+            }
           ]
         },
-        "responseMode": "lastNode"
-      }
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "00000000-0000-0000-0000-000000000001",
+      "name": "Intake Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        304
+      ],
+      "webhookId": "relay-hitl-intake"
     },
     {
-      "id": "00000000-0000-0000-0000-000000000002",
-      "name": "Load Client Context",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [240, 300],
       "parameters": {
         "mode": "manual",
         "fields": {
           "values": [
-            {"name": "client_name", "type": "string", "stringValue": "={{ $json.client }}"},
-            {"name": "platform", "type": "string", "stringValue": "={{ $json.platform }}"},
-            {"name": "content_type", "type": "string", "stringValue": "={{ $json.content_type }}"},
-            {"name": "topic_hint", "type": "string", "stringValue": "={{ $json.topic_hint }}"},
-            {"name": "tone_note", "type": "string", "stringValue": "={{ $json.tone_note || 'Professional and engaging' }}"},
-            {"name": "workflow_start_time", "type": "string", "stringValue": "={{ new Date().toISOString() }}"},
-            {"name": "brand_guide", "type": "string", "stringValue": "PASTE_FULL_CONTENT_OF_resources/loopin-brand-guide.md_HERE"},
-            {"name": "platform_playbook", "type": "string", "stringValue": "PASTE_FULL_CONTENT_OF_resources/relay-platform-playbook.md_HERE"}
+            {
+              "name": "client_name",
+              "type": "string",
+              "stringValue": "={{ $json.Client }}"
+            },
+            {
+              "name": "platform",
+              "type": "string",
+              "stringValue": "={{ $json.Platform }}"
+            },
+            {
+              "name": "content_type",
+              "type": "string",
+              "stringValue": "={{ $json['Content Type'] }}"
+            },
+            {
+              "name": "topic_hint",
+              "type": "string",
+              "stringValue": "={{ $json['Topic Hint'] }}"
+            },
+            {
+              "name": "tone_note",
+              "type": "string",
+              "stringValue": "={{ $json['Tone Note'] || 'Professional and engaging' }}"
+            },
+            {
+              "name": "workflow_start_time",
+              "type": "string",
+              "stringValue": "={{ new Date().toISOString() }}"
+            },
+            {
+              "name": "brand_guide",
+              "type": "string",
+              "stringValue": "PASTE_FULL_CONTENT_OF_resources/loopin-brand-guide.md_HERE"
+            },
+            {
+              "name": "platform_playbook",
+              "type": "string",
+              "stringValue": "PASTE_FULL_CONTENT_OF_resources/relay-platform-playbook.md_HERE"
+            }
           ]
         },
         "options": {}
-      }
+      },
+      "id": "00000000-0000-0000-0000-000000000002",
+      "name": "Load Client Context",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        304
+      ]
     },
     {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\nreturn [{ json: {\n  ...d,\n  iterations_sofia: 0,\n  iterations_marcus: 0,\n  sofia_feedback: '',\n  marcus_feedback: '',\n  approved_angle: '',\n  post_copy: '',\n  image_direction: '',\n  taylor_approval_round: 0\n}}];"
+      },
       "id": "00000000-0000-0000-0000-000000000003",
       "name": "Init State",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [480, 300],
-      "parameters": {
-        "mode": "runOnceForAllItems",
-        "jsCode": "const d = $input.first().json;\nreturn [{ json: {\n  ...d,\n  iterations_sofia: 0,\n  iterations_marcus: 0,\n  sofia_feedback: '',\n  marcus_feedback: '',\n  approved_angle: '',\n  post_copy: '',\n  image_direction: '',\n  taylor_approval_round: 0\n}}];"
-      }
+      "position": [
+        480,
+        304
+      ]
     },
     {
+      "parameters": {
+        "mode": "chooseBranch"
+      },
       "id": "00000000-0000-0000-0000-000000000004",
       "name": "Sofia Loop Entry",
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
-      "position": [720, 300],
-      "parameters": {"mode": "chooseBranch", "options": {}}
+      "position": [
+        720,
+        304
+      ]
     },
     {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\nconst feedbackSection = d.sofia_feedback\n  ? `\\nPrevious reviewer feedback to address:\\n${d.sofia_feedback}\\n`\n  : '';\n\nconst prompt = `You are Sofia, a content strategy researcher at Relay.\\n\\nClient: ${d.client_name}\\nPlatform: ${d.platform}\\nContent Type: ${d.content_type}\\nTopic Hint: ${d.topic_hint}\\nTone Note: ${d.tone_note}\\n\\n### Brand Context\\n${d.brand_guide}\\n\\n### Platform Context\\n${d.platform_playbook}\\n${feedbackSection}\\nTask: Generate exactly 3 content angle options. Each angle must:\\n1. Be specific and tailored to ${d.platform} audience\\n2. Reference the brand voice and key messages from Loopin\\n3. Include a clear rationale explaining why it fits\\n4. Avoid generic startup clichés\\n\\nFormat response as:\\n**Angle 1: [Title]**\\n[1-2 sentence rationale]\\n\\n**Angle 2: [Title]**\\n[1-2 sentence rationale]\\n\\n**Angle 3: [Title]**\\n[1-2 sentence rationale]`;\n\nreturn [{ json: { ...d, sofia_prompt: prompt } }];"
+      },
       "id": "00000000-0000-0000-0000-000000000005",
       "name": "Build Sofia Prompt",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [960, 300],
-      "parameters": {
-        "mode": "runOnceForAllItems",
-        "jsCode": "const d = $input.first().json;\nconst feedbackSection = d.sofia_feedback\n  ? `\\nPrevious reviewer feedback to address:\\n${d.sofia_feedback}\\n`\n  : '';\n\nconst prompt = `You are Sofia, a content strategy researcher at Relay.\\n\\nClient: ${d.client_name}\\nPlatform: ${d.platform}\\nContent Type: ${d.content_type}\\nTopic Hint: ${d.topic_hint}\\nTone Note: ${d.tone_note}\\n\\n### Brand Context\\n${d.brand_guide}\\n\\n### Platform Context\\n${d.platform_playbook}\\n${feedbackSection}\\nTask: Generate exactly 3 content angle options. Each angle must:\\n1. Be specific and tailored to ${d.platform} audience\\n2. Reference the brand voice and key messages from Loopin\\n3. Include a clear rationale explaining why it fits\\n4. Avoid generic startup clichés\\n\\nFormat response as:\\n**Angle 1: [Title]**\\n[1-2 sentence rationale]\\n\\n**Angle 2: [Title]**\\n[1-2 sentence rationale]\\n\\n**Angle 3: [Title]**\\n[1-2 sentence rationale]`;\n\nreturn [{ json: { ...d, sofia_prompt: prompt } }];"
-      }
+      "position": [
+        1168,
+        304
+      ]
     },
     {
-      "id": "00000000-0000-0000-0000-000000000006",
-      "name": "Sofia AI",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [1200, 300],
       "parameters": {
         "method": "POST",
         "url": "https://api.anthropic.com/v1/messages",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "anthropicApi",
         "sendHeaders": true,
-        "headerParameters": {"parameters": [{"name": "anthropic-version", "value": "2023-06-01"}]},
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            }
+          ]
+        },
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1500, messages: [{ role: 'user', content: $json.sofia_prompt }] }) }}",
         "options": {}
       },
-      "credentials": {"anthropicApi": {"id": "{{ANTHROPIC_CRED_ID}}", "name": "Anthropic account"}}
+      "id": "00000000-0000-0000-0000-000000000006",
+      "name": "Sofia AI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1408,
+        304
+      ],
+      "credentials": {
+        "anthropicApi": {
+          "id": "{{ANTHROPIC_CRED_ID}}",
+          "name": "Anthropic account"
+        }
+      }
     },
     {
+      "parameters": {
+        "jsCode": "const apiResp = $input.first().json;\nconst ctx = $('Build Sofia Prompt').first().json;\nconst sofia_angles = apiResp.content?.[0]?.text || '';\nreturn [{ json: { ...ctx, sofia_angles } }];"
+      },
       "id": "00000000-0000-0000-0000-000000000007",
       "name": "Parse Sofia Output",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1440, 300],
-      "parameters": {
-        "mode": "runOnceForAllItems",
-        "jsCode": "const apiResp = $input.first().json;\nconst ctx = $('Build Sofia Prompt').first().json;\nconst sofia_angles = apiResp.content?.[0]?.text || '';\nreturn [{ json: { ...ctx, sofia_angles } }];"
-      }
+      "position": [
+        1856,
+        304
+      ]
     },
     {
-      "id": "00000000-0000-0000-0000-000000000008",
-      "name": "Sofia Review",
-      "type": "n8n-nodes-gotohuman.gotoHuman",
-      "typeVersion": 1,
-      "position": [1680, 300],
       "parameters": {
-        "formType": "{{SOFIA_TEMPLATE_ID}}",
-        "fieldsUi": {
-          "fieldValues": [
-            {"key": "client", "value": "={{ $json.client_name }}"},
-            {"key": "platform", "value": "={{ $json.platform }}"},
-            {"key": "content_type", "value": "={{ $json.content_type }}"},
-            {"key": "ai_angles", "value": "={{ $json.sofia_angles }}"}
-          ]
-        }
+        "jsCode": "const d = $input.first().json;\nconst ctx = $('Parse Sofia Output').first().json;\n\nconst decision = d.sofia_decision || d.data?.sofia_decision || d.response?.sofia_decision || '';\nconst notes = d.sofia_notes || d.data?.sofia_notes || d.response?.sofia_notes || '';\n\nreturn [{ json: { ...ctx, sofia_decision: decision, sofia_notes: notes } }];"
       },
-      "credentials": {"gotoHumanApi": {"id": "{{GOTOHUMAN_CRED_ID}}", "name": "gotoHuman-n8n-HITL"}}
-    },
-    {
       "id": "00000000-0000-0000-0000-000000000009",
       "name": "Process Sofia Decision",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1920, 300],
-      "parameters": {
-        "mode": "runOnceForAllItems",
-        "jsCode": "const d = $input.first().json;\nconst ctx = $('Parse Sofia Output').first().json;\n\nconst decision = d.sofia_decision || d.data?.sofia_decision || d.response?.sofia_decision || '';\nconst notes = d.sofia_notes || d.data?.sofia_notes || d.response?.sofia_notes || '';\n\nreturn [{ json: { ...ctx, sofia_decision: decision, sofia_notes: notes } }];"
-      }
+      "position": [
+        2544,
+        304
+      ]
     },
     {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "sofia-approve-check",
+              "leftValue": "={{ $json.sofia_decision }}",
+              "rightValue": "Approve",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
       "id": "00000000-0000-0000-0000-000000000010",
       "name": "Route Sofia Decision",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
-      "position": [2160, 300],
-      "parameters": {
-        "conditions": {
-          "options": {"caseSensitive": false, "leftValue": "", "typeValidation": "loose"},
-          "conditions": [{"id": "sofia-approve-check", "leftValue": "={{ $json.sofia_decision }}", "rightValue": "Approve", "operator": {"type": "string", "operation": "startsWith"}}],
-          "combinator": "and"
-        },
-        "options": {}
-      }
+      "position": [
+        2784,
+        304
+      ]
     },
     {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\nconst decision = d.sofia_decision || '';\nlet approved_angle = decision.replace(/^Approve:?\\s*/i, '').trim();\nif (!approved_angle) approved_angle = (d.sofia_angles || '').split('\\n')[0];\nreturn [{ json: { ...d, approved_angle, sofia_feedback: '' } }];"
+      },
       "id": "00000000-0000-0000-0000-000000000012",
       "name": "Set Approved Angle",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2400, 100],
-      "parameters": {
-        "mode": "runOnceForAllItems",
-        "jsCode": "const d = $input.first().json;\nconst decision = d.sofia_decision || '';\nlet approved_angle = decision.replace(/^Approve:?\\s*/i, '').trim();\nif (!approved_angle) approved_angle = (d.sofia_angles || '').split('\\n')[0];\nreturn [{ json: { ...d, approved_angle, sofia_feedback: '' } }];"
-      }
+      "position": [
+        3024,
+        112
+      ]
     },
     {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\nif ((d.iterations_sofia || 0) >= 3) {\n  throw new Error('Sofia revision limit (3) reached. Manual intervention required.');\n}\nreturn [{ json: {\n  ...d,\n  iterations_sofia: (d.iterations_sofia || 0) + 1,\n  sofia_feedback: d.sofia_notes || ''\n}}];"
+      },
       "id": "00000000-0000-0000-0000-000000000011",
       "name": "Inc Sofia Counter",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2400, 500],
-      "parameters": {
-        "mode": "runOnceForAllItems",
-        "jsCode": "const d = $input.first().json;\nif ((d.iterations_sofia || 0) >= 3) {\n  throw new Error('Sofia revision limit (3) reached. Manual intervention required.');\n}\nreturn [{ json: {\n  ...d,\n  iterations_sofia: (d.iterations_sofia || 0) + 1,\n  sofia_feedback: d.sofia_notes || ''\n}}];"
-      }
+      "position": [
+        3024,
+        512
+      ]
     },
     {
+      "parameters": {
+        "mode": "chooseBranch"
+      },
       "id": "00000000-0000-0000-0000-000000000013",
       "name": "Marcus Loop Entry",
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
-      "position": [0, 1000],
-      "parameters": {"mode": "chooseBranch", "options": {}}
+      "position": [
+        0,
+        1008
+      ]
     },
     {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\nconst feedbackSection = d.marcus_feedback\n  ? `\\nPrevious feedback to incorporate:\\n${d.marcus_feedback}\\n`\n  : '';\nconst platformLimits = {\n  'LinkedIn': '800-1500 characters',\n  'X (Twitter)': 'max 280 characters (single tweet) or 3-7 tweet thread',\n  'Instagram': '200-400 character caption'\n};\nconst charLimit = platformLimits[d.platform] || '800-1200 characters';\n\nconst prompt = `You are Marcus, a creative at Relay.\\n\\nApproved Angle: ${d.approved_angle}\\nPlatform: ${d.platform}\\nContent Type: ${d.content_type}\\nTone: ${d.tone_note}\\n\\n### Brand Context\\n${d.brand_guide}\\n\\n### Platform Context\\n${d.platform_playbook}\\n${feedbackSection}\\nTask: Create a social media post for ${d.platform} based on the approved angle.\\n\\n**Post Copy Requirements:**\\n- Length: ${charLimit}\\n- Hook first\\n- Tone: ${d.tone_note}\\n- Loopin voice: clear, direct, human, practical, confident\\n- End with ONE CTA\\n\\n**Image Direction Requirements:**\\n- Be specific (not 'create an image' - describe exactly what to show)\\n- Reference Loopin brand colors (#5B4AE8 primary, #00D9C8 accent)\\n- For Instagram: describe each carousel slide individually\\n- For LinkedIn: describe screenshot, stat graphic, or photo\\n- For X: optional - only describe if it adds value\\n\\nFormat response EXACTLY as:\\n**Post Copy:**\\n[copy here]\\n\\n**Image Direction:**\\n[specific visual description]`;\n\nreturn [{ json: { ...d, marcus_prompt: prompt } }];"
+      },
       "id": "00000000-0000-0000-0000-000000000014",
       "name": "Build Marcus Prompt",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [240, 1000],
-      "parameters": {
-        "mode": "runOnceForAllItems",
-        "jsCode": "const d = $input.first().json;\nconst feedbackSection = d.marcus_feedback\n  ? `\\nPrevious feedback to incorporate:\\n${d.marcus_feedback}\\n`\n  : '';\nconst platformLimits = {\n  'LinkedIn': '800-1500 characters',\n  'X (Twitter)': 'max 280 characters (single tweet) or 3-7 tweet thread',\n  'Instagram': '200-400 character caption'\n};\nconst charLimit = platformLimits[d.platform] || '800-1200 characters';\n\nconst prompt = `You are Marcus, a creative at Relay.\\n\\nApproved Angle: ${d.approved_angle}\\nPlatform: ${d.platform}\\nContent Type: ${d.content_type}\\nTone: ${d.tone_note}\\n\\n### Brand Context\\n${d.brand_guide}\\n\\n### Platform Context\\n${d.platform_playbook}\\n${feedbackSection}\\nTask: Create a social media post for ${d.platform} based on the approved angle.\\n\\n**Post Copy Requirements:**\\n- Length: ${charLimit}\\n- Hook first\\n- Tone: ${d.tone_note}\\n- Loopin voice: clear, direct, human, practical, confident\\n- End with ONE CTA\\n\\n**Image Direction Requirements:**\\n- Be specific (not 'create an image' - describe exactly what to show)\\n- Reference Loopin brand colors (#5B4AE8 primary, #00D9C8 accent)\\n- For Instagram: describe each carousel slide individually\\n- For LinkedIn: describe screenshot, stat graphic, or photo\\n- For X: optional - only describe if it adds value\\n\\nFormat response EXACTLY as:\\n**Post Copy:**\\n[copy here]\\n\\n**Image Direction:**\\n[specific visual description]`;\n\nreturn [{ json: { ...d, marcus_prompt: prompt } }];"
-      }
+      "position": [
+        240,
+        1008
+      ]
     },
     {
-      "id": "00000000-0000-0000-0000-000000000015",
-      "name": "Marcus AI",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [480, 1000],
       "parameters": {
         "method": "POST",
         "url": "https://api.anthropic.com/v1/messages",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "anthropicApi",
         "sendHeaders": true,
-        "headerParameters": {"parameters": [{"name": "anthropic-version", "value": "2023-06-01"}]},
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            }
+          ]
+        },
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 2000, messages: [{ role: 'user', content: $json.marcus_prompt }] }) }}",
         "options": {}
       },
-      "credentials": {"anthropicApi": {"id": "{{ANTHROPIC_CRED_ID}}", "name": "Anthropic account"}}
+      "id": "00000000-0000-0000-0000-000000000015",
+      "name": "Marcus AI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        1008
+      ],
+      "credentials": {
+        "anthropicApi": {
+          "id": "{{ANTHROPIC_CRED_ID}}",
+          "name": "Anthropic account"
+        }
+      }
     },
     {
+      "parameters": {
+        "jsCode": "const apiResp = $input.first().json;\nconst ctx = $('Build Marcus Prompt').first().json;\nconst rawText = apiResp.content?.[0]?.text || '';\n\nconst copyMatch = rawText.match(/\\*\\*Post Copy:\\*\\*\\s*([\\s\\S]*?)(?=\\*\\*Image Direction:\\*\\*|$)/i);\nconst imgMatch = rawText.match(/\\*\\*Image Direction:\\*\\*\\s*([\\s\\S]*?)$/i);\n\nconst post_copy = copyMatch ? copyMatch[1].trim() : rawText;\nconst image_direction = imgMatch ? imgMatch[1].trim() : '(See post copy)';\n\nreturn [{ json: { ...ctx, post_copy, image_direction } }];"
+      },
       "id": "00000000-0000-0000-0000-000000000016",
       "name": "Parse Marcus Output",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [720, 1000],
-      "parameters": {
-        "mode": "runOnceForAllItems",
-        "jsCode": "const apiResp = $input.first().json;\nconst ctx = $('Build Marcus Prompt').first().json;\nconst rawText = apiResp.content?.[0]?.text || '';\n\nconst copyMatch = rawText.match(/\\*\\*Post Copy:\\*\\*\\s*([\\s\\S]*?)(?=\\*\\*Image Direction:\\*\\*|$)/i);\nconst imgMatch = rawText.match(/\\*\\*Image Direction:\\*\\*\\s*([\\s\\S]*?)$/i);\n\nconst post_copy = copyMatch ? copyMatch[1].trim() : rawText;\nconst image_direction = imgMatch ? imgMatch[1].trim() : '(See post copy)';\n\nreturn [{ json: { ...ctx, post_copy, image_direction } }];"
-      }
+      "position": [
+        720,
+        1008
+      ]
     },
     {
-      "id": "00000000-0000-0000-0000-000000000017",
-      "name": "Taylor Preview Call",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [960, 1000],
       "parameters": {
         "method": "POST",
         "url": "https://api.anthropic.com/v1/messages",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "anthropicApi",
         "sendHeaders": true,
-        "headerParameters": {"parameters": [{"name": "anthropic-version", "value": "2023-06-01"}]},
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            }
+          ]
+        },
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 800, messages: [{ role: 'user', content: `You are Taylor, a content quality reviewer at Relay.\\n\\nPost copy: ${$json.post_copy}\\nImage direction: ${$json.image_direction}\\nPlatform: ${$json.platform}\\nOriginal brief: ${$json.topic_hint}\\n\\n### Brand Context\\n${$json.brand_guide}\\n\\n### Platform Context\\n${$json.platform_playbook}\\n\\nAnalyze this and respond ONLY with valid JSON (no markdown, no preamble):\\n{\\n  \"summary\": \"2-3 sentence description\",\\n  \"quality_flags\": [\"flag1\", \"flag2\"],\\n  \"recommendation\": \"approve | needs_revision | reject_to_sofia\",\\n  \"reasoning\": \"brief explanation\"\\n}\\n\\nBe strict on brand fit.` }] }) }}",
         "options": {}
       },
-      "credentials": {"anthropicApi": {"id": "{{ANTHROPIC_CRED_ID}}", "name": "Anthropic account"}}
+      "id": "00000000-0000-0000-0000-000000000017",
+      "name": "Taylor Preview Call",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1216,
+        1008
+      ],
+      "credentials": {
+        "anthropicApi": {
+          "id": "{{ANTHROPIC_CRED_ID}}",
+          "name": "Anthropic account"
+        }
+      }
     },
     {
+      "parameters": {
+        "jsCode": "const apiResp = $input.first().json;\nconst ctx = $('Parse Marcus Output').first().json;\nlet preview;\ntry {\n  const raw = (apiResp.content?.[0]?.text || '{}').replace(/```json\\n?/g,'').replace(/```\\n?/g,'').trim();\n  preview = JSON.parse(raw);\n} catch(e) {\n  preview = { summary: '(Preview unavailable)', quality_flags: [], recommendation: 'needs_review', reasoning: 'Parse error' };\n}\n\nconst flags = preview.quality_flags?.length > 0\n  ? preview.quality_flags.map(f => `- ${f}`).join('\\n')\n  : '- No flags identified';\n\nconst taylor_preview_md = `**Taylor Preview (AI)**\\n\\n**Summary:** ${preview.summary}\\n\\n**Quality Flags:**\\n${flags}\\n\\n**Recommendation:** ${preview.recommendation}\\n**Reasoning:** ${preview.reasoning}`;\n\nreturn [{ json: { ...ctx, taylor_preview_md, taylor_preview_json: preview } }];"
+      },
       "id": "00000000-0000-0000-0000-000000000018",
       "name": "Format Taylor Preview",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1200, 1000],
-      "parameters": {
-        "mode": "runOnceForAllItems",
-        "jsCode": "const apiResp = $input.first().json;\nconst ctx = $('Parse Marcus Output').first().json;\nlet preview;\ntry {\n  const raw = (apiResp.content?.[0]?.text || '{}').replace(/```json\\n?/g,'').replace(/```\\n?/g,'').trim();\n  preview = JSON.parse(raw);\n} catch(e) {\n  preview = { summary: '(Preview unavailable)', quality_flags: [], recommendation: 'needs_review', reasoning: 'Parse error' };\n}\n\nconst flags = preview.quality_flags?.length > 0\n  ? preview.quality_flags.map(f => `- ${f}`).join('\\n')\n  : '- No flags identified';\n\nconst taylor_preview_md = `**Taylor Preview (AI)**\\n\\n**Summary:** ${preview.summary}\\n\\n**Quality Flags:**\\n${flags}\\n\\n**Recommendation:** ${preview.recommendation}\\n**Reasoning:** ${preview.reasoning}`;\n\nreturn [{ json: { ...ctx, taylor_preview_md, taylor_preview_json: preview } }];"
-      }
+      "position": [
+        1408,
+        1008
+      ]
     },
     {
-      "id": "00000000-0000-0000-0000-000000000019",
-      "name": "Marcus Review",
-      "type": "n8n-nodes-gotohuman.gotoHuman",
-      "typeVersion": 1,
-      "position": [1440, 1000],
       "parameters": {
-        "formType": "{{MARCUS_TEMPLATE_ID}}",
-        "fieldsUi": {
-          "fieldValues": [
-            {"key": "angle", "value": "={{ $json.approved_angle }}"},
-            {"key": "post_copy", "value": "={{ $json.post_copy }}"},
-            {"key": "image_direction", "value": "={{ $json.image_direction }}"},
-            {"key": "taylor_preview", "value": "={{ $json.taylor_preview_md }}"}
-          ]
-        }
+        "jsCode": "const d = $input.first().json;\nconst ctx = $('Format Taylor Preview').first().json;\n\nconst decision = d.marcus_decision || d.data?.marcus_decision || d.response?.marcus_decision || '';\nconst notes = d.marcus_notes || d.data?.marcus_notes || d.response?.marcus_notes || '';\n\nreturn [{ json: { ...ctx, marcus_decision: decision, marcus_notes: notes } }];"
       },
-      "credentials": {"gotoHumanApi": {"id": "{{GOTOHUMAN_CRED_ID}}", "name": "gotoHuman-n8n-HITL"}}
-    },
-    {
       "id": "00000000-0000-0000-0000-000000000020",
       "name": "Process Marcus Decision",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1680, 1000],
-      "parameters": {
-        "mode": "runOnceForAllItems",
-        "jsCode": "const d = $input.first().json;\nconst ctx = $('Format Taylor Preview').first().json;\n\nconst decision = d.marcus_decision || d.data?.marcus_decision || d.response?.marcus_decision || '';\nconst notes = d.marcus_notes || d.data?.marcus_notes || d.response?.marcus_notes || '';\n\nreturn [{ json: { ...ctx, marcus_decision: decision, marcus_notes: notes } }];"
-      }
+      "position": [
+        2304,
+        1008
+      ]
     },
     {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "marcus-send-check",
+              "leftValue": "={{ $json.marcus_decision }}",
+              "rightValue": "Send to Taylor",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
       "id": "00000000-0000-0000-0000-000000000021",
       "name": "Route Marcus Decision",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
-      "position": [1920, 1000],
-      "parameters": {
-        "conditions": {
-          "options": {"caseSensitive": false, "leftValue": "", "typeValidation": "loose"},
-          "conditions": [{"id": "marcus-send-check", "leftValue": "={{ $json.marcus_decision }}", "rightValue": "Send to Taylor", "operator": {"type": "string", "operation": "equals"}}],
-          "combinator": "and"
-        },
-        "options": {}
-      }
+      "position": [
+        2544,
+        1008
+      ]
     },
     {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\nif ((d.iterations_marcus || 0) >= 3) {\n  throw new Error('Marcus revision limit (3) reached. Manual intervention required.');\n}\nreturn [{ json: {\n  ...d,\n  iterations_marcus: (d.iterations_marcus || 0) + 1,\n  marcus_feedback: d.marcus_notes || ''\n}}];"
+      },
       "id": "00000000-0000-0000-0000-000000000022",
       "name": "Inc Marcus Counter",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2160, 1200],
-      "parameters": {
-        "mode": "runOnceForAllItems",
-        "jsCode": "const d = $input.first().json;\nif ((d.iterations_marcus || 0) >= 3) {\n  throw new Error('Marcus revision limit (3) reached. Manual intervention required.');\n}\nreturn [{ json: {\n  ...d,\n  iterations_marcus: (d.iterations_marcus || 0) + 1,\n  marcus_feedback: d.marcus_notes || ''\n}}];"
-      }
+      "position": [
+        2784,
+        1200
+      ]
     },
     {
+      "parameters": {
+        "mode": "chooseBranch"
+      },
       "id": "00000000-0000-0000-0000-000000000023",
       "name": "Taylor Loop Entry",
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
-      "position": [0, 1700],
-      "parameters": {"mode": "chooseBranch", "options": {}}
+      "position": [
+        0,
+        1712
+      ]
     },
     {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\nconst prompt = `You are Taylor, final QC reviewer at Relay.\\n\\nOriginal Brief: ${d.topic_hint}\\nPlatform: ${d.platform}\\n\\n### Brand Context\\n${d.brand_guide}\\n\\n### Platform Context\\n${d.platform_playbook}\\n\\nPost Copy:\\n${d.post_copy}\\n\\nImage Direction:\\n${d.image_direction}\\n\\nTask: Review the post for quality, brand fit, and platform compliance.\\n\\nProvide:\\n1. **Summary** (2-3 sentences describing what the post says)\\n2. **Quality Flags** (list issues: tone misalignment, spec violations, brand inconsistency, generic messaging)\\n3. **AI Recommendation** (approve | needs_revision | reject_to_sofia)\\n4. **Brief reasoning** (1 sentence why)\\n\\nBe strict on brand fit. Posts should feel written specifically for Loopin, not generic SaaS copy.`;\n\nreturn [{ json: { ...d, taylor_prompt: prompt } }];"
+      },
       "id": "00000000-0000-0000-0000-000000000024",
       "name": "Build Taylor Prompt",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [240, 1700],
-      "parameters": {
-        "mode": "runOnceForAllItems",
-        "jsCode": "const d = $input.first().json;\nconst prompt = `You are Taylor, final QC reviewer at Relay.\\n\\nOriginal Brief: ${d.topic_hint}\\nPlatform: ${d.platform}\\n\\n### Brand Context\\n${d.brand_guide}\\n\\n### Platform Context\\n${d.platform_playbook}\\n\\nPost Copy:\\n${d.post_copy}\\n\\nImage Direction:\\n${d.image_direction}\\n\\nTask: Review the post for quality, brand fit, and platform compliance.\\n\\nProvide:\\n1. **Summary** (2-3 sentences describing what the post says)\\n2. **Quality Flags** (list issues: tone misalignment, spec violations, brand inconsistency, generic messaging)\\n3. **AI Recommendation** (approve | needs_revision | reject_to_sofia)\\n4. **Brief reasoning** (1 sentence why)\\n\\nBe strict on brand fit. Posts should feel written specifically for Loopin, not generic SaaS copy.`;\n\nreturn [{ json: { ...d, taylor_prompt: prompt } }];"
-      }
+      "position": [
+        240,
+        1712
+      ]
     },
     {
-      "id": "00000000-0000-0000-0000-000000000025",
-      "name": "Taylor AI",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [480, 1700],
       "parameters": {
         "method": "POST",
         "url": "https://api.anthropic.com/v1/messages",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "anthropicApi",
         "sendHeaders": true,
-        "headerParameters": {"parameters": [{"name": "anthropic-version", "value": "2023-06-01"}]},
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            }
+          ]
+        },
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1000, messages: [{ role: 'user', content: $json.taylor_prompt }] }) }}",
         "options": {}
       },
-      "credentials": {"anthropicApi": {"id": "{{ANTHROPIC_CRED_ID}}", "name": "Anthropic account"}}
+      "id": "00000000-0000-0000-0000-000000000025",
+      "name": "Taylor AI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        1712
+      ],
+      "credentials": {
+        "anthropicApi": {
+          "id": "{{ANTHROPIC_CRED_ID}}",
+          "name": "Anthropic account"
+        }
+      }
     },
     {
+      "parameters": {
+        "jsCode": "const apiResp = $input.first().json;\nconst ctx = $('Build Taylor Prompt').first().json;\nconst rawText = apiResp.content?.[0]?.text || '';\n\nconst summaryMatch = rawText.match(/\\*\\*Summary\\*\\*[:\\s]*([\\s\\S]*?)(?=\\*\\*Quality Flags|$)/i);\nconst flagsMatch = rawText.match(/\\*\\*Quality Flags\\*\\*[:\\s]*([\\s\\S]*?)(?=\\*\\*AI Recommendation|$)/i);\nconst recMatch = rawText.match(/\\*\\*AI Recommendation\\*\\*[:\\s]*(approve|needs_revision|reject_to_sofia)/i);\nconst reasonMatch = rawText.match(/\\*\\*Brief reasoning\\*\\*[:\\s]*([\\s\\S]*?)$/i);\n\nreturn [{ json: {\n  ...ctx,\n  ai_summary: summaryMatch ? summaryMatch[1].trim() : rawText,\n  ai_flags: flagsMatch ? flagsMatch[1].trim() : '',\n  ai_recommendation: recMatch ? recMatch[1].trim() : 'needs_revision',\n  ai_reasoning: reasonMatch ? reasonMatch[1].trim() : ''\n}}];"
+      },
       "id": "00000000-0000-0000-0000-000000000026",
       "name": "Parse Taylor Analysis",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [720, 1700],
-      "parameters": {
-        "mode": "runOnceForAllItems",
-        "jsCode": "const apiResp = $input.first().json;\nconst ctx = $('Build Taylor Prompt').first().json;\nconst rawText = apiResp.content?.[0]?.text || '';\n\nconst summaryMatch = rawText.match(/\\*\\*Summary\\*\\*[:\\s]*([\\s\\S]*?)(?=\\*\\*Quality Flags|$)/i);\nconst flagsMatch = rawText.match(/\\*\\*Quality Flags\\*\\*[:\\s]*([\\s\\S]*?)(?=\\*\\*AI Recommendation|$)/i);\nconst recMatch = rawText.match(/\\*\\*AI Recommendation\\*\\*[:\\s]*(approve|needs_revision|reject_to_sofia)/i);\nconst reasonMatch = rawText.match(/\\*\\*Brief reasoning\\*\\*[:\\s]*([\\s\\S]*?)$/i);\n\nreturn [{ json: {\n  ...ctx,\n  ai_summary: summaryMatch ? summaryMatch[1].trim() : rawText,\n  ai_flags: flagsMatch ? flagsMatch[1].trim() : '',\n  ai_recommendation: recMatch ? recMatch[1].trim() : 'needs_revision',\n  ai_reasoning: reasonMatch ? reasonMatch[1].trim() : ''\n}}];"
-      }
+      "position": [
+        720,
+        1712
+      ]
     },
     {
-      "id": "00000000-0000-0000-0000-000000000027",
-      "name": "Taylor Review",
-      "type": "n8n-nodes-gotohuman.gotoHuman",
-      "typeVersion": 1,
-      "position": [960, 1700],
       "parameters": {
-        "formType": "{{TAYLOR_TEMPLATE_ID}}",
-        "fieldsUi": {
-          "fieldValues": [
-            {"key": "post_copy", "value": "={{ $json.post_copy }}"},
-            {"key": "image_direction", "value": "={{ $json.image_direction }}"},
-            {"key": "original_brief", "value": "={{ $json.topic_hint }}"},
-            {"key": "ai_summary", "value": "={{ $json.ai_summary }}"},
-            {"key": "ai_flags", "value": "={{ $json.ai_flags }}"},
-            {"key": "ai_recommendation", "value": "={{ $json.ai_recommendation }}"}
-          ]
-        }
+        "jsCode": "const d = $input.first().json;\nconst ctx = $('Parse Taylor Analysis').first().json;\n\nconst decision = d.taylor_decision || d.data?.taylor_decision || d.response?.taylor_decision || '';\nconst notes = d.taylor_notes || d.data?.taylor_notes || d.response?.taylor_notes || '';\nconst round = (ctx.taylor_approval_round || 0) + 1;\n\nreturn [{ json: { ...ctx, taylor_decision: decision, taylor_notes: notes, taylor_approval_round: round } }];"
       },
-      "credentials": {"gotoHumanApi": {"id": "{{GOTOHUMAN_CRED_ID}}", "name": "gotoHuman-n8n-HITL"}}
-    },
-    {
       "id": "00000000-0000-0000-0000-000000000028",
       "name": "Process Taylor Decision",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1200, 1700],
-      "parameters": {
-        "mode": "runOnceForAllItems",
-        "jsCode": "const d = $input.first().json;\nconst ctx = $('Parse Taylor Analysis').first().json;\n\nconst decision = d.taylor_decision || d.data?.taylor_decision || d.response?.taylor_decision || '';\nconst notes = d.taylor_notes || d.data?.taylor_notes || d.response?.taylor_notes || '';\nconst round = (ctx.taylor_approval_round || 0) + 1;\n\nreturn [{ json: { ...ctx, taylor_decision: decision, taylor_notes: notes, taylor_approval_round: round } }];"
-      }
+      "position": [
+        1408,
+        1712
+      ]
     },
     {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "id": "t-approve",
+                    "leftValue": "={{ $json.taylor_decision }}",
+                    "rightValue": "Approve",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and",
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              },
+              "renameOutput": true,
+              "outputKey": "Approve"
+            },
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "id": "t-marcus",
+                    "leftValue": "={{ $json.taylor_decision }}",
+                    "rightValue": "Back to Marcus",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and",
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              },
+              "renameOutput": true,
+              "outputKey": "Back to Marcus"
+            },
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "id": "t-sofia",
+                    "leftValue": "={{ $json.taylor_decision }}",
+                    "rightValue": "Back to Sofia",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and",
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              },
+              "renameOutput": true,
+              "outputKey": "Back to Sofia"
+            }
+          ]
+        },
+        "options": {}
+      },
       "id": "00000000-0000-0000-0000-000000000029",
       "name": "Route Taylor Decision",
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
-      "position": [1440, 1700],
-      "parameters": {
-        "mode": "rules",
-        "rules": {
-          "values": [
-            {"conditions": {"conditions": [{"id": "t-approve", "leftValue": "={{ $json.taylor_decision }}", "rightValue": "Approve", "operator": {"type": "string", "operation": "equals"}}], "combinator": "and"}, "renameOutput": true, "outputKey": "Approve"},
-            {"conditions": {"conditions": [{"id": "t-marcus", "leftValue": "={{ $json.taylor_decision }}", "rightValue": "Back to Marcus", "operator": {"type": "string", "operation": "equals"}}], "combinator": "and"}, "renameOutput": true, "outputKey": "Back to Marcus"},
-            {"conditions": {"conditions": [{"id": "t-sofia", "leftValue": "={{ $json.taylor_decision }}", "rightValue": "Back to Sofia", "operator": {"type": "string", "operation": "equals"}}], "combinator": "and"}, "renameOutput": true, "outputKey": "Back to Sofia"}
-          ]
-        },
-        "fallbackOutput": "none",
-        "options": {}
-      }
+      "position": [
+        1856,
+        1712
+      ]
     },
     {
-      "id": "00000000-0000-0000-0000-000000000030",
-      "name": "Log to Google Sheets",
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.5,
-      "position": [1680, 1540],
       "parameters": {
         "operation": "append",
-        "documentId": {"__rl": true, "value": "1Nhxi8wQPS2aOcVEkLnjqNTG7tWUAhgTpRVXBOvET_0Y", "mode": "id"},
-        "sheetName": {"__rl": true, "value": "Sheet1", "mode": "name"},
+        "documentId": {
+          "__rl": true,
+          "value": "{{GOOGLE_SHEETS_SPREADSHEET_ID}}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
@@ -494,80 +731,503 @@
         },
         "options": {}
       },
-      "credentials": {"googleSheetsOAuth2Api": {"id": "{{GOOGLE_SHEETS_CRED_ID}}", "name": "Google Sheets account"}}
+      "id": "00000000-0000-0000-0000-000000000030",
+      "name": "Log to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2304,
+        1552
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "{{GOOGLE_SHEETS_CRED_ID}}",
+          "name": "Google Sheets account"
+        }
+      }
     },
     {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\nreturn [{ json: {\n  ...d,\n  marcus_feedback: `Taylor review feedback:\\n${d.taylor_notes || ''}`,\n  iterations_marcus: (d.iterations_marcus || 0) + 1\n}}];"
+      },
       "id": "00000000-0000-0000-0000-000000000031",
       "name": "Prep Back To Marcus",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1680, 1700],
-      "parameters": {
-        "mode": "runOnceForAllItems",
-        "jsCode": "const d = $input.first().json;\nreturn [{ json: {\n  ...d,\n  marcus_feedback: `Taylor review feedback:\\n${d.taylor_notes || ''}`,\n  iterations_marcus: (d.iterations_marcus || 0) + 1\n}}];"
-      }
+      "position": [
+        2304,
+        1712
+      ]
     },
     {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\nreturn [{ json: {\n  ...d,\n  sofia_feedback: `Quality concern from Taylor:\\n${d.taylor_notes || ''}`,\n  iterations_sofia: (d.iterations_sofia || 0) + 1,\n  marcus_feedback: ''\n}}];"
+      },
       "id": "00000000-0000-0000-0000-000000000032",
       "name": "Prep Back To Sofia",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1680, 1860],
+      "position": [
+        2304,
+        1872
+      ]
+    },
+    {
       "parameters": {
-        "mode": "runOnceForAllItems",
-        "jsCode": "const d = $input.first().json;\nreturn [{ json: {\n  ...d,\n  sofia_feedback: `Quality concern from Taylor:\\n${d.taylor_notes || ''}`,\n  iterations_sofia: (d.iterations_sofia || 0) + 1,\n  marcus_feedback: ''\n}}];"
+        "reviewTemplateID": {
+          "__rl": true,
+          "value": "{{SOFIA_TEMPLATE_ID}}",
+          "mode": "list",
+          "cachedResultName": "1. Sofia Review ({{SOFIA_TEMPLATE_ID}})"
+        },
+        "reviewData": "={\n  \"client\": \"={{ $json.client_name }}\",\n  \"platform\": \"={{ $json.platform }}\",\n  \"content_type\": \"={{ $json.content_type }}\",\n  \"ai_angles\": \"={{ $json.sofia_angles }}\"\n}\n",
+        "additionalFields": {}
+      },
+      "type": "@gotohuman/n8n-nodes-gotohuman.gotoHuman",
+      "typeVersion": 2,
+      "position": [
+        2064,
+        304
+      ],
+      "id": "c2c548b6-05a6-4df7-b94f-8eaa4e645cd9",
+      "name": "Sofia Review",
+      "webhookId": "d239ed5e-b6a0-44ce-aa69-64bc551b264b",
+      "credentials": {
+        "gotoHumanApi": {
+          "id": "{{GOTOHUMAN_CRED_ID}}",
+          "name": "gotoHuman-n8n-HITL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "reviewTemplateID": {
+          "__rl": true,
+          "value": "{{MARCUS_TEMPLATE_ID}}",
+          "mode": "list",
+          "cachedResultName": "2: Marcus Review ({{MARCUS_TEMPLATE_ID}})"
+        },
+        "reviewData": "={\n  \"angle\": \"={{ $json.approved_angle }}\",\n  \"post_copy\": \"={{ $json.post_copy }}\",\n  \"image_direction\": \"={{ $json.image_direction }}\",\n  \"taylor_preview\": \"={{ $json.taylor_preview_md }}\"\n}\n",
+        "additionalFields": {}
+      },
+      "type": "@gotohuman/n8n-nodes-gotohuman.gotoHuman",
+      "typeVersion": 2,
+      "position": [
+        1616,
+        1008
+      ],
+      "id": "a8311edc-6885-4bc2-b178-21bca3d84ac0",
+      "name": "Marcus Review",
+      "webhookId": "1f076ae6-e3d1-4086-930c-375f40331a8b",
+      "credentials": {
+        "gotoHumanApi": {
+          "id": "{{GOTOHUMAN_CRED_ID}}",
+          "name": "gotoHuman-n8n-HITL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "reviewTemplateID": {
+          "__rl": true,
+          "value": "{{TAYLOR_TEMPLATE_ID}}",
+          "mode": "list",
+          "cachedResultName": "3: Taylor Review ({{TAYLOR_TEMPLATE_ID}})"
+        },
+        "reviewData": "={\n  \"post_copy\": \"={{ $json.post_copy }}\",\n  \"image_direction\": \"={{ $json.image_direction }}\",\n  \"original_brief\": \"={{ $json.topic_hint }}\",\n  \"ai_summary\": \"={{ $json.ai_summary }}\",\n  \"ai_flags\": \"={{ $json.ai_flags }}\",\n  \"ai_recommendation\": \"={{ $json.ai_recommendation }}\"\n}\n",
+        "additionalFields": {}
+      },
+      "type": "@gotohuman/n8n-nodes-gotohuman.gotoHuman",
+      "typeVersion": 2,
+      "position": [
+        1008,
+        1712
+      ],
+      "id": "d4b9a1f0-63a9-4821-bc64-b1ab5669ac42",
+      "name": "Taylor Review",
+      "webhookId": "5ccff726-e6bc-43f9-9b53-ddb57d36a36b",
+      "credentials": {
+        "gotoHumanApi": {
+          "id": "{{GOTOHUMAN_CRED_ID}}",
+          "name": "gotoHuman-n8n-HITL"
+        }
       }
     }
   ],
   "connections": {
-    "Intake Form": {"main": [[{"node": "Load Client Context", "type": "main", "index": 0}]]},
-    "Load Client Context": {"main": [[{"node": "Init State", "type": "main", "index": 0}]]},
-    "Init State": {"main": [[{"node": "Sofia Loop Entry", "type": "main", "index": 0}]]},
-    "Inc Sofia Counter": {"main": [[{"node": "Sofia Loop Entry", "type": "main", "index": 1}]]},
-    "Prep Back To Sofia": {"main": [[{"node": "Sofia Loop Entry", "type": "main", "index": 2}]]},
-    "Sofia Loop Entry": {"main": [[{"node": "Build Sofia Prompt", "type": "main", "index": 0}]]},
-    "Build Sofia Prompt": {"main": [[{"node": "Sofia AI", "type": "main", "index": 0}]]},
-    "Sofia AI": {"main": [[{"node": "Parse Sofia Output", "type": "main", "index": 0}]]},
-    "Parse Sofia Output": {"main": [[{"node": "Sofia Review", "type": "main", "index": 0}]]},
-    "Sofia Review": {"main": [[{"node": "Process Sofia Decision", "type": "main", "index": 0}]]},
-    "Process Sofia Decision": {"main": [[{"node": "Route Sofia Decision", "type": "main", "index": 0}]]},
+    "Intake Form": {
+      "main": [
+        [
+          {
+            "node": "Load Client Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Client Context": {
+      "main": [
+        [
+          {
+            "node": "Init State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Init State": {
+      "main": [
+        [
+          {
+            "node": "Sofia Loop Entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inc Sofia Counter": {
+      "main": [
+        [
+          {
+            "node": "Sofia Loop Entry",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Prep Back To Sofia": {
+      "main": [
+        [
+          {
+            "node": "Sofia Loop Entry",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Sofia Loop Entry": {
+      "main": [
+        [
+          {
+            "node": "Build Sofia Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Sofia Prompt": {
+      "main": [
+        [
+          {
+            "node": "Sofia AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sofia AI": {
+      "main": [
+        [
+          {
+            "node": "Parse Sofia Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Sofia Output": {
+      "main": [
+        [
+          {
+            "node": "Sofia Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Sofia Decision": {
+      "main": [
+        [
+          {
+            "node": "Route Sofia Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Route Sofia Decision": {
       "main": [
-        [{"node": "Set Approved Angle", "type": "main", "index": 0}],
-        [{"node": "Inc Sofia Counter", "type": "main", "index": 0}]
+        [
+          {
+            "node": "Set Approved Angle",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Inc Sofia Counter",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
-    "Set Approved Angle": {"main": [[{"node": "Marcus Loop Entry", "type": "main", "index": 0}]]},
-    "Inc Marcus Counter": {"main": [[{"node": "Marcus Loop Entry", "type": "main", "index": 1}]]},
-    "Prep Back To Marcus": {"main": [[{"node": "Marcus Loop Entry", "type": "main", "index": 2}]]},
-    "Marcus Loop Entry": {"main": [[{"node": "Build Marcus Prompt", "type": "main", "index": 0}]]},
-    "Build Marcus Prompt": {"main": [[{"node": "Marcus AI", "type": "main", "index": 0}]]},
-    "Marcus AI": {"main": [[{"node": "Parse Marcus Output", "type": "main", "index": 0}]]},
-    "Parse Marcus Output": {"main": [[{"node": "Taylor Preview Call", "type": "main", "index": 0}]]},
-    "Taylor Preview Call": {"main": [[{"node": "Format Taylor Preview", "type": "main", "index": 0}]]},
-    "Format Taylor Preview": {"main": [[{"node": "Marcus Review", "type": "main", "index": 0}]]},
-    "Marcus Review": {"main": [[{"node": "Process Marcus Decision", "type": "main", "index": 0}]]},
-    "Process Marcus Decision": {"main": [[{"node": "Route Marcus Decision", "type": "main", "index": 0}]]},
+    "Set Approved Angle": {
+      "main": [
+        [
+          {
+            "node": "Marcus Loop Entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inc Marcus Counter": {
+      "main": [
+        [
+          {
+            "node": "Marcus Loop Entry",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Prep Back To Marcus": {
+      "main": [
+        [
+          {
+            "node": "Marcus Loop Entry",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Marcus Loop Entry": {
+      "main": [
+        [
+          {
+            "node": "Build Marcus Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Marcus Prompt": {
+      "main": [
+        [
+          {
+            "node": "Marcus AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marcus AI": {
+      "main": [
+        [
+          {
+            "node": "Parse Marcus Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Marcus Output": {
+      "main": [
+        [
+          {
+            "node": "Taylor Preview Call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Taylor Preview Call": {
+      "main": [
+        [
+          {
+            "node": "Format Taylor Preview",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Taylor Preview": {
+      "main": [
+        [
+          {
+            "node": "Marcus Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Marcus Decision": {
+      "main": [
+        [
+          {
+            "node": "Route Marcus Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Route Marcus Decision": {
       "main": [
-        [{"node": "Taylor Loop Entry", "type": "main", "index": 0}],
-        [{"node": "Inc Marcus Counter", "type": "main", "index": 0}]
+        [
+          {
+            "node": "Taylor Loop Entry",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Inc Marcus Counter",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
-    "Taylor Loop Entry": {"main": [[{"node": "Build Taylor Prompt", "type": "main", "index": 0}]]},
-    "Build Taylor Prompt": {"main": [[{"node": "Taylor AI", "type": "main", "index": 0}]]},
-    "Taylor AI": {"main": [[{"node": "Parse Taylor Analysis", "type": "main", "index": 0}]]},
-    "Parse Taylor Analysis": {"main": [[{"node": "Taylor Review", "type": "main", "index": 0}]]},
-    "Taylor Review": {"main": [[{"node": "Process Taylor Decision", "type": "main", "index": 0}]]},
-    "Process Taylor Decision": {"main": [[{"node": "Route Taylor Decision", "type": "main", "index": 0}]]},
+    "Taylor Loop Entry": {
+      "main": [
+        [
+          {
+            "node": "Build Taylor Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Taylor Prompt": {
+      "main": [
+        [
+          {
+            "node": "Taylor AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Taylor AI": {
+      "main": [
+        [
+          {
+            "node": "Parse Taylor Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Taylor Analysis": {
+      "main": [
+        [
+          {
+            "node": "Taylor Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Taylor Decision": {
+      "main": [
+        [
+          {
+            "node": "Route Taylor Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Route Taylor Decision": {
       "main": [
-        [{"node": "Log to Google Sheets", "type": "main", "index": 0}],
-        [{"node": "Prep Back To Marcus", "type": "main", "index": 0}],
-        [{"node": "Prep Back To Sofia", "type": "main", "index": 0}]
+        [
+          {
+            "node": "Log to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prep Back To Marcus",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prep Back To Sofia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sofia Review": {
+      "main": [
+        [
+          {
+            "node": "Process Sofia Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marcus Review": {
+      "main": [
+        [
+          {
+            "node": "Process Marcus Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Taylor Review": {
+      "main": [
+        [
+          {
+            "node": "Process Taylor Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     }
   },
-  "settings": {"executionOrder": "v1", "saveManualExecutions": true},
+  "settings": {
+    "executionOrder": "v2",
+    "saveManualExecutions": true
+  },
   "staticData": null
 }
