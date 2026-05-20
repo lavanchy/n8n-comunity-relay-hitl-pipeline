@@ -1,9 +1,714 @@
 {
-  "__comment": "n8n Workflow JSON — wird via Claude Code generiert und dann hier eingecheckt. Alle Credential-IDs als {{PLACEHOLDER}} belassen.",
   "name": "Relay HITL Content Pipeline",
-  "nodes": [],
-  "connections": {},
+  "nodes": [
+    {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "name": "Intake Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [0, 300],
+      "webhookId": "relay-hitl-intake",
+      "parameters": {
+        "formTitle": "Relay Content Brief",
+        "formDescription": "Submit a new content brief to the HITL pipeline (Sofia → Marcus → Taylor)",
+        "formFields": {
+          "values": [
+            {"fieldLabel": "Client", "fieldType": "text", "fieldId": "client", "requiredField": true, "placeholder": "e.g. Loopin"},
+            {"fieldLabel": "Platform", "fieldType": "dropdown", "fieldId": "platform", "requiredField": true, "fieldOptions": {"values": [{"option": "LinkedIn"}, {"option": "X (Twitter)"}, {"option": "Instagram"}]}},
+            {"fieldLabel": "Content Type", "fieldType": "text", "fieldId": "content_type", "requiredField": true, "placeholder": "e.g. Product announcement, Thought leadership, Culture post"},
+            {"fieldLabel": "Topic Hint", "fieldType": "textarea", "fieldId": "topic_hint", "requiredField": true},
+            {"fieldLabel": "Tone Note", "fieldType": "textarea", "fieldId": "tone_note", "requiredField": false, "placeholder": "e.g. Founder voice, direct, not corporate"}
+          ]
+        },
+        "responseMode": "lastNode"
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000002",
+      "name": "Load Client Context",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [220, 300],
+      "parameters": {
+        "mode": "manual",
+        "fields": {
+          "values": [
+            {"name": "client_name", "type": "string", "stringValue": "={{ $json.client }}"},
+            {"name": "platform", "type": "string", "stringValue": "={{ $json.platform }}"},
+            {"name": "content_type", "type": "string", "stringValue": "={{ $json.content_type }}"},
+            {"name": "topic_hint", "type": "string", "stringValue": "={{ $json.topic_hint }}"},
+            {"name": "tone_note", "type": "string", "stringValue": "={{ $json.tone_note || 'Professional and engaging' }}"},
+            {"name": "workflow_start_time", "type": "string", "stringValue": "={{ new Date().toISOString() }}"},
+            {
+              "name": "brand_guide",
+              "type": "string",
+              "stringValue": "PASTE_FULL_CONTENT_OF_resources/loopin-brand-guide.md_HERE"
+            },
+            {
+              "name": "platform_playbook",
+              "type": "string",
+              "stringValue": "PASTE_FULL_CONTENT_OF_resources/relay-platform-playbook.md_HERE"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000003",
+      "name": "Init State",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 300],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const d = $input.first().json;\nreturn [{ json: {\n  ...d,\n  iterations_sofia: 0,\n  iterations_marcus: 0,\n  sofia_feedback: '',\n  marcus_feedback: '',\n  approved_angle: '',\n  post_copy: '',\n  image_direction: '',\n  taylor_approval_round: 0\n}}];"
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000004",
+      "name": "Sofia Loop Entry",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [660, 300],
+      "parameters": {
+        "mode": "chooseBranch",
+        "options": {}
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000005",
+      "name": "Build Sofia Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 300],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const d = $input.first().json;\nconst feedbackSection = d.sofia_feedback\n  ? `\\nPrevious reviewer feedback to address:\\n${d.sofia_feedback}\\n`\n  : '';\n\nconst prompt = `You are Sofia, a content strategy researcher at Relay.\n\nClient: ${d.client_name}\nPlatform: ${d.platform}\nContent Type: ${d.content_type}\nTopic Hint: ${d.topic_hint}\nTone Note: ${d.tone_note}\n\n### Brand Context\n${d.brand_guide}\n\n### Platform Context\n${d.platform_playbook}\n${feedbackSection}\nTask: Generate exactly 3 content angle options. Each angle must:\n1. Be specific and tailored to ${d.platform} audience\n2. Reference the brand voice and key messages from Loopin\n3. Include a clear rationale explaining why it fits\n4. Avoid generic startup clichés\n\nFormat response as:\n**Angle 1: [Title]**\n[1-2 sentence rationale]\n\n**Angle 2: [Title]**\n[1-2 sentence rationale]\n\n**Angle 3: [Title]**\n[1-2 sentence rationale]`;\n\nreturn [{ json: { ...d, sofia_prompt: prompt } }];"
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000006",
+      "name": "Sofia AI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {"name": "anthropic-version", "value": "2023-06-01"},
+            {"name": "content-type", "value": "application/json"}
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1500, messages: [{ role: 'user', content: $json.sofia_prompt }] }) }}",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "{{ANTHROPIC_CRED_ID}}",
+          "name": "Anthropic API Key"
+        }
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000007",
+      "name": "Create Sofia Review",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.gotohuman.com/v1/form-requests",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  templateId: '{{SOFIA_TEMPLATE_ID}}',\n  callbackUrl: $execution.resumeUrl,\n  data: {\n    client: $json.client_name,\n    platform: $json.platform,\n    content_type: $json.content_type,\n    ai_angles: $json.content[0].text,\n    _ctx: JSON.stringify({\n      client_name: $json.client_name,\n      platform: $json.platform,\n      content_type: $json.content_type,\n      topic_hint: $json.topic_hint,\n      tone_note: $json.tone_note,\n      brand_guide: $json.brand_guide,\n      platform_playbook: $json.platform_playbook,\n      workflow_start_time: $json.workflow_start_time,\n      iterations_sofia: $json.iterations_sofia,\n      iterations_marcus: $json.iterations_marcus,\n      approved_angle: $json.approved_angle,\n      marcus_feedback: $json.marcus_feedback\n    })\n  }\n}) }}",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "{{GOTOHUMAN_CRED_ID}}",
+          "name": "gotoHuman API Key"
+        }
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000008",
+      "name": "Wait Sofia Review",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [1540, 300],
+      "webhookId": "00000000-0000-0000-wait-sofia000001",
+      "parameters": {
+        "resume": "webhook",
+        "options": {}
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000009",
+      "name": "Process Sofia Decision",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1760, 300],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const webhook = $input.first().json;\nconst ctx = JSON.parse($('Create Sofia Review').first().json._ctx || '{}');\n\nconst decision = webhook.data?.sofia_decision || webhook.sofia_decision || '';\nconst notes = webhook.data?.sofia_notes || webhook.sofia_notes || '';\nconst angles = $('Sofia AI').first().json.content[0].text;\n\nreturn [{ json: {\n  ...ctx,\n  sofia_decision: decision,\n  sofia_notes: notes,\n  sofia_angles: angles\n}}];"
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000010",
+      "name": "Route Sofia Decision",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1980, 300],
+      "parameters": {
+        "conditions": {
+          "options": {"caseSensitive": false, "leftValue": "", "typeValidation": "loose"},
+          "conditions": [
+            {
+              "id": "sofia-approve-check",
+              "leftValue": "={{ $json.sofia_decision }}",
+              "rightValue": "Approve",
+              "operator": {"type": "string", "operation": "startsWith"}
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000011",
+      "name": "Inc Sofia Counter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2200, 480],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const d = $input.first().json;\nif ((d.iterations_sofia || 0) >= 3) {\n  throw new Error('Sofia revision limit (3) reached. Manual intervention required.');\n}\nreturn [{ json: {\n  ...d,\n  iterations_sofia: (d.iterations_sofia || 0) + 1,\n  sofia_feedback: d.sofia_notes || ''\n}}];"
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000012",
+      "name": "Set Approved Angle",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2200, 120],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const d = $input.first().json;\nconst decision = d.sofia_decision || '';\nconst angles = d.sofia_angles || '';\n\n// Extract which angle was approved from decision string (e.g. 'Approve: Angle 1: The title')\nlet approved_angle = decision.replace(/^Approve:?\\s*/i, '').trim();\nif (!approved_angle) approved_angle = angles.split('\\n')[0];\n\nreturn [{ json: { ...d, approved_angle, sofia_feedback: '' }}];"
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000013",
+      "name": "Marcus Loop Entry",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [2420, 120],
+      "parameters": {
+        "mode": "chooseBranch",
+        "options": {}
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000014",
+      "name": "Build Marcus Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2640, 120],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const d = $input.first().json;\nconst feedbackSection = d.marcus_feedback\n  ? `\\nPrevious feedback to incorporate:\\n${d.marcus_feedback}\\n`\n  : '';\n\nconst platformLimits = {\n  'LinkedIn': '800-1500 characters',\n  'X (Twitter)': 'max 280 characters (single tweet) or 3-7 tweet thread',\n  'Instagram': '200-400 character caption'\n};\nconst charLimit = platformLimits[d.platform] || '800-1200 characters';\n\nconst prompt = `You are Marcus, a creative at Relay.\n\nApproved Angle: ${d.approved_angle}\nPlatform: ${d.platform}\nContent Type: ${d.content_type}\nTone: ${d.tone_note}\n\n### Brand Context\n${d.brand_guide}\n\n### Platform Context\n${d.platform_playbook}\n${feedbackSection}\nTask: Create a social media post for ${d.platform} based on the approved angle.\n\n**Post Copy Requirements:**\n- Length: ${charLimit}\n- Hook first\n- Tone: ${d.tone_note}\n- Loopin voice: clear, direct, human, practical, confident\n- End with ONE CTA\n\n**Image Direction Requirements:**\n- Be specific (not 'create an image' — describe exactly what to show)\n- Reference Loopin brand colors (#5B4AE8 primary, #00D9C8 accent)\n- For Instagram: describe each carousel slide individually\n- For LinkedIn: describe screenshot, stat graphic, or photo\n- For X: optional — only describe if it adds value\n\nFormat response EXACTLY as:\n**Post Copy:**\n[copy here]\n\n**Image Direction:**\n[specific visual description]`;\n\nreturn [{ json: { ...d, marcus_prompt: prompt } }];"
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000015",
+      "name": "Marcus AI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2860, 120],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {"name": "anthropic-version", "value": "2023-06-01"},
+            {"name": "content-type", "value": "application/json"}
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 2000, messages: [{ role: 'user', content: $json.marcus_prompt }] }) }}",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "{{ANTHROPIC_CRED_ID}}",
+          "name": "Anthropic API Key"
+        }
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000016",
+      "name": "Parse Marcus Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3080, 120],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const d = $input.first().json;\nconst marcusCtx = $('Build Marcus Prompt').first().json;\nconst rawText = d.content[0].text;\n\nconst copyMatch = rawText.match(/\\*\\*Post Copy:\\*\\*\\s*([\\s\\S]*?)(?=\\*\\*Image Direction:\\*\\*|$)/i);\nconst imgMatch = rawText.match(/\\*\\*Image Direction:\\*\\*\\s*([\\s\\S]*?)$/i);\n\nconst post_copy = copyMatch ? copyMatch[1].trim() : rawText;\nconst image_direction = imgMatch ? imgMatch[1].trim() : '(See post copy for visual context)';\n\nreturn [{ json: { ...marcusCtx, post_copy, image_direction } }];"
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000017",
+      "name": "Taylor Preview Call",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [3300, 120],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {"name": "anthropic-version", "value": "2023-06-01"},
+            {"name": "content-type", "value": "application/json"}
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 800, messages: [{ role: 'user', content: `You are Taylor, a content quality reviewer at Relay.\\n\\nPost copy: ${$json.post_copy}\\nImage direction: ${$json.image_direction}\\nPlatform: ${$json.platform}\\nOriginal brief: ${$json.topic_hint}\\n\\n### Brand Context\\n${$json.brand_guide}\\n\\n### Platform Context\\n${$json.platform_playbook}\\n\\nAnalyze this and respond ONLY with valid JSON (no markdown, no preamble):\\n{\\n  \"summary\": \"2-3 sentence description of what the post says and what it tries to do\",\\n  \"quality_flags\": [\"flag1\", \"flag2\"],\\n  \"recommendation\": \"approve | needs_revision | reject_to_sofia\",\\n  \"reasoning\": \"brief explanation\"\\n}\\n\\nBe strict on brand fit and specificity.` }] }) }}",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "{{ANTHROPIC_CRED_ID}}",
+          "name": "Anthropic API Key"
+        }
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000018",
+      "name": "Format Taylor Preview",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3520, 120],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const d = $input.first().json;\nconst marcusCtx = $('Parse Marcus Output').first().json;\nlet preview;\ntry {\n  const raw = d.content[0].text.replace(/```json\\n?/g,'').replace(/```\\n?/g,'').trim();\n  preview = JSON.parse(raw);\n} catch(e) {\n  preview = { summary: '(Preview unavailable)', quality_flags: [], recommendation: 'needs_review', reasoning: 'Parse error' };\n}\n\nconst flags = preview.quality_flags?.length > 0\n  ? preview.quality_flags.map(f => `- ${f}`).join('\\n')\n  : '- No flags identified';\n\nconst previewMd = `**Taylor Preview (AI)**\\n\\n**Summary:** ${preview.summary}\\n\\n**Quality Flags:**\\n${flags}\\n\\n**Recommendation:** ${preview.recommendation}\\n**Reasoning:** ${preview.reasoning}`;\n\nreturn [{ json: { ...marcusCtx, taylor_preview_md: previewMd, taylor_preview_json: preview } }];"
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000019",
+      "name": "Create Marcus Review",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [3740, 120],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.gotohuman.com/v1/form-requests",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  templateId: '{{MARCUS_TEMPLATE_ID}}',\n  callbackUrl: $execution.resumeUrl,\n  data: {\n    angle: $json.approved_angle,\n    post_copy: $json.post_copy,\n    image_direction: $json.image_direction,\n    taylor_preview: $json.taylor_preview_md,\n    _ctx: JSON.stringify({\n      client_name: $json.client_name,\n      platform: $json.platform,\n      content_type: $json.content_type,\n      topic_hint: $json.topic_hint,\n      tone_note: $json.tone_note,\n      brand_guide: $json.brand_guide,\n      platform_playbook: $json.platform_playbook,\n      workflow_start_time: $json.workflow_start_time,\n      iterations_sofia: $json.iterations_sofia,\n      iterations_marcus: $json.iterations_marcus,\n      approved_angle: $json.approved_angle,\n      post_copy: $json.post_copy,\n      image_direction: $json.image_direction\n    })\n  }\n}) }}",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "{{GOTOHUMAN_CRED_ID}}",
+          "name": "gotoHuman API Key"
+        }
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000020",
+      "name": "Wait Marcus Review",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [3960, 120],
+      "webhookId": "00000000-0000-0000-wait-marcus00001",
+      "parameters": {
+        "resume": "webhook",
+        "options": {}
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000021",
+      "name": "Process Marcus Decision",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [4180, 120],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const webhook = $input.first().json;\nconst ctx = JSON.parse($('Create Marcus Review').first().json._ctx || '{}');\n\nconst decision = webhook.data?.marcus_decision || webhook.marcus_decision || '';\nconst notes = webhook.data?.marcus_notes || webhook.marcus_notes || '';\n\nreturn [{ json: { ...ctx, marcus_decision: decision, marcus_notes: notes } }];"
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000022",
+      "name": "Route Marcus Decision",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [4400, 120],
+      "parameters": {
+        "conditions": {
+          "options": {"caseSensitive": false, "leftValue": "", "typeValidation": "loose"},
+          "conditions": [
+            {
+              "id": "marcus-send-check",
+              "leftValue": "={{ $json.marcus_decision }}",
+              "rightValue": "Send to Taylor",
+              "operator": {"type": "string", "operation": "equals"}
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000023",
+      "name": "Inc Marcus Counter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [4620, 300],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const d = $input.first().json;\nif ((d.iterations_marcus || 0) >= 3) {\n  throw new Error('Marcus revision limit (3) reached. Manual intervention required.');\n}\nreturn [{ json: {\n  ...d,\n  iterations_marcus: (d.iterations_marcus || 0) + 1,\n  marcus_feedback: d.marcus_notes || ''\n}}];"
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000024",
+      "name": "Taylor Loop Entry",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [4620, 120],
+      "parameters": {
+        "mode": "chooseBranch",
+        "options": {}
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000025",
+      "name": "Build Taylor Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [4840, 120],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const d = $input.first().json;\nconst prompt = `You are Taylor, final QC reviewer at Relay.\\n\\nOriginal Brief: ${d.topic_hint}\\nPlatform: ${d.platform}\\n\\n### Brand Context\\n${d.brand_guide}\\n\\n### Platform Context\\n${d.platform_playbook}\\n\\nPost Copy:\\n${d.post_copy}\\n\\nImage Direction:\\n${d.image_direction}\\n\\nTask: Review the post for quality, brand fit, and platform compliance.\\n\\nProvide:\\n1. **Summary** (2-3 sentences describing what the post says and what it's trying to do)\\n2. **Quality Flags** (list any issues: tone misalignment, platform spec violations, brand inconsistency, generic messaging)\\n3. **AI Recommendation** (approve | needs_revision | reject_to_sofia)\\n4. **Brief reasoning** (1 sentence why)\\n\\nBe strict on brand fit. Posts should feel written specifically for Loopin, not generic SaaS copy.`;\n\nreturn [{ json: { ...d, taylor_prompt: prompt } }];"
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000026",
+      "name": "Taylor AI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [5060, 120],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {"name": "anthropic-version", "value": "2023-06-01"},
+            {"name": "content-type", "value": "application/json"}
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1000, messages: [{ role: 'user', content: $json.taylor_prompt }] }) }}",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "{{ANTHROPIC_CRED_ID}}",
+          "name": "Anthropic API Key"
+        }
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000027",
+      "name": "Parse Taylor Analysis",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [5280, 120],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const d = $input.first().json;\nconst ctx = $('Build Taylor Prompt').first().json;\nconst rawText = d.content[0].text;\n\nconst summaryMatch = rawText.match(/\\*\\*Summary\\*\\*[:\\s]*([\\s\\S]*?)(?=\\*\\*Quality Flags|$)/i);\nconst flagsMatch = rawText.match(/\\*\\*Quality Flags\\*\\*[:\\s]*([\\s\\S]*?)(?=\\*\\*AI Recommendation|$)/i);\nconst recMatch = rawText.match(/\\*\\*AI Recommendation\\*\\*[:\\s]*(approve|needs_revision|reject_to_sofia)/i);\nconst reasonMatch = rawText.match(/\\*\\*Brief reasoning\\*\\*[:\\s]*([\\s\\S]*?)$/i);\n\nreturn [{ json: {\n  ...ctx,\n  ai_summary: summaryMatch ? summaryMatch[1].trim() : rawText,\n  ai_flags: flagsMatch ? flagsMatch[1].trim() : '',\n  ai_recommendation: recMatch ? recMatch[1].trim() : 'needs_revision',\n  ai_reasoning: reasonMatch ? reasonMatch[1].trim() : ''\n}}];"
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000028",
+      "name": "Create Taylor Review",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [5500, 120],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.gotohuman.com/v1/form-requests",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  templateId: '{{TAYLOR_TEMPLATE_ID}}',\n  callbackUrl: $execution.resumeUrl,\n  data: {\n    post_copy: $json.post_copy,\n    image_direction: $json.image_direction,\n    original_brief: $json.topic_hint,\n    ai_summary: $json.ai_summary,\n    ai_flags: $json.ai_flags,\n    ai_recommendation: $json.ai_recommendation,\n    _ctx: JSON.stringify({\n      client_name: $json.client_name,\n      platform: $json.platform,\n      content_type: $json.content_type,\n      topic_hint: $json.topic_hint,\n      tone_note: $json.tone_note,\n      brand_guide: $json.brand_guide,\n      platform_playbook: $json.platform_playbook,\n      workflow_start_time: $json.workflow_start_time,\n      iterations_sofia: $json.iterations_sofia,\n      iterations_marcus: $json.iterations_marcus,\n      approved_angle: $json.approved_angle,\n      post_copy: $json.post_copy,\n      image_direction: $json.image_direction,\n      taylor_approval_round: ($json.taylor_approval_round || 0) + 1\n    })\n  }\n}) }}",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "{{GOTOHUMAN_CRED_ID}}",
+          "name": "gotoHuman API Key"
+        }
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000029",
+      "name": "Wait Taylor Review",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [5720, 120],
+      "webhookId": "00000000-0000-0000-wait-taylor00001",
+      "parameters": {
+        "resume": "webhook",
+        "options": {}
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000030",
+      "name": "Process Taylor Decision",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [5940, 120],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const webhook = $input.first().json;\nconst ctx = JSON.parse($('Create Taylor Review').first().json._ctx || '{}');\n\nconst decision = webhook.data?.taylor_decision || webhook.taylor_decision || '';\nconst notes = webhook.data?.taylor_notes || webhook.taylor_notes || '';\n\nreturn [{ json: { ...ctx, taylor_decision: decision, taylor_notes: notes } }];"
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000031",
+      "name": "Route Taylor Decision",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [6160, 120],
+      "parameters": {
+        "mode": "rules",
+        "rules": {
+          "values": [
+            {
+              "conditions": {"conditions": [{"id": "t-approve", "leftValue": "={{ $json.taylor_decision }}", "rightValue": "Approve", "operator": {"type": "string", "operation": "equals"}}], "combinator": "and"},
+              "renameOutput": true,
+              "outputKey": "Approve"
+            },
+            {
+              "conditions": {"conditions": [{"id": "t-marcus", "leftValue": "={{ $json.taylor_decision }}", "rightValue": "Back to Marcus", "operator": {"type": "string", "operation": "equals"}}], "combinator": "and"},
+              "renameOutput": true,
+              "outputKey": "Back to Marcus"
+            },
+            {
+              "conditions": {"conditions": [{"id": "t-sofia", "leftValue": "={{ $json.taylor_decision }}", "rightValue": "Back to Sofia", "operator": {"type": "string", "operation": "equals"}}], "combinator": "and"},
+              "renameOutput": true,
+              "outputKey": "Back to Sofia"
+            }
+          ]
+        },
+        "fallbackOutput": "none",
+        "options": {}
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000032",
+      "name": "Log to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [6380, 0],
+      "parameters": {
+        "operation": "append",
+        "documentId": {"__rl": true, "value": "={{ $vars.GOOGLE_SHEETS_SPREADSHEET_ID || 'REPLACE_WITH_SPREADSHEET_ID' }}", "mode": "id"},
+        "sheetName": {"__rl": true, "value": "Sheet1", "mode": "name"},
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "timestamp": "={{ $json.workflow_start_time }}",
+            "client": "={{ $json.client_name }}",
+            "platform": "={{ $json.platform }}",
+            "content_type": "={{ $json.content_type }}",
+            "approved_angle": "={{ $json.approved_angle }}",
+            "post_copy": "={{ $json.post_copy }}",
+            "image_direction": "={{ $json.image_direction }}",
+            "iterations_sofia": "={{ $json.iterations_sofia }}",
+            "iterations_marcus": "={{ $json.iterations_marcus }}",
+            "total_iterations": "={{ ($json.iterations_sofia || 0) + ($json.iterations_marcus || 0) }}",
+            "approval_time_seconds": "={{ Math.round((new Date() - new Date($json.workflow_start_time)) / 1000) }}",
+            "status": "APPROVED",
+            "taylor_approval_round": "={{ $json.taylor_approval_round || 1 }}"
+          }
+        },
+        "options": {}
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "{{GOOGLE_SHEETS_CRED_ID}}",
+          "name": "Google Sheets"
+        }
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000033",
+      "name": "Prep Back To Marcus",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [6380, 200],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const d = $input.first().json;\nreturn [{ json: {\n  ...d,\n  marcus_feedback: `Taylor review feedback:\\n${d.taylor_notes || ''}`,\n  iterations_marcus: (d.iterations_marcus || 0) + 1\n}}];"
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000034",
+      "name": "Prep Back To Sofia",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [6380, 360],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const d = $input.first().json;\nreturn [{ json: {\n  ...d,\n  sofia_feedback: `Quality concern from Taylor: ${d.taylor_notes || ''}`,\n  iterations_sofia: (d.iterations_sofia || 0) + 1,\n  marcus_feedback: ''\n}}];"
+      }
+    }
+  ],
+  "connections": {
+    "Intake Form": {
+      "main": [[{"node": "Load Client Context", "type": "main", "index": 0}]]
+    },
+    "Load Client Context": {
+      "main": [[{"node": "Init State", "type": "main", "index": 0}]]
+    },
+    "Init State": {
+      "main": [[{"node": "Sofia Loop Entry", "type": "main", "index": 0}]]
+    },
+    "Inc Sofia Counter": {
+      "main": [[{"node": "Sofia Loop Entry", "type": "main", "index": 1}]]
+    },
+    "Prep Back To Sofia": {
+      "main": [[{"node": "Sofia Loop Entry", "type": "main", "index": 2}]]
+    },
+    "Sofia Loop Entry": {
+      "main": [[{"node": "Build Sofia Prompt", "type": "main", "index": 0}]]
+    },
+    "Build Sofia Prompt": {
+      "main": [[{"node": "Sofia AI", "type": "main", "index": 0}]]
+    },
+    "Sofia AI": {
+      "main": [[{"node": "Create Sofia Review", "type": "main", "index": 0}]]
+    },
+    "Create Sofia Review": {
+      "main": [[{"node": "Wait Sofia Review", "type": "main", "index": 0}]]
+    },
+    "Wait Sofia Review": {
+      "main": [[{"node": "Process Sofia Decision", "type": "main", "index": 0}]]
+    },
+    "Process Sofia Decision": {
+      "main": [[{"node": "Route Sofia Decision", "type": "main", "index": 0}]]
+    },
+    "Route Sofia Decision": {
+      "main": [
+        [{"node": "Set Approved Angle", "type": "main", "index": 0}],
+        [{"node": "Inc Sofia Counter", "type": "main", "index": 0}]
+      ]
+    },
+    "Set Approved Angle": {
+      "main": [[{"node": "Marcus Loop Entry", "type": "main", "index": 0}]]
+    },
+    "Inc Marcus Counter": {
+      "main": [[{"node": "Marcus Loop Entry", "type": "main", "index": 1}]]
+    },
+    "Prep Back To Marcus": {
+      "main": [[{"node": "Marcus Loop Entry", "type": "main", "index": 2}]]
+    },
+    "Marcus Loop Entry": {
+      "main": [[{"node": "Build Marcus Prompt", "type": "main", "index": 0}]]
+    },
+    "Build Marcus Prompt": {
+      "main": [[{"node": "Marcus AI", "type": "main", "index": 0}]]
+    },
+    "Marcus AI": {
+      "main": [[{"node": "Parse Marcus Output", "type": "main", "index": 0}]]
+    },
+    "Parse Marcus Output": {
+      "main": [[{"node": "Taylor Preview Call", "type": "main", "index": 0}]]
+    },
+    "Taylor Preview Call": {
+      "main": [[{"node": "Format Taylor Preview", "type": "main", "index": 0}]]
+    },
+    "Format Taylor Preview": {
+      "main": [[{"node": "Create Marcus Review", "type": "main", "index": 0}]]
+    },
+    "Create Marcus Review": {
+      "main": [[{"node": "Wait Marcus Review", "type": "main", "index": 0}]]
+    },
+    "Wait Marcus Review": {
+      "main": [[{"node": "Process Marcus Decision", "type": "main", "index": 0}]]
+    },
+    "Process Marcus Decision": {
+      "main": [[{"node": "Route Marcus Decision", "type": "main", "index": 0}]]
+    },
+    "Route Marcus Decision": {
+      "main": [
+        [{"node": "Taylor Loop Entry", "type": "main", "index": 0}],
+        [{"node": "Inc Marcus Counter", "type": "main", "index": 0}]
+      ]
+    },
+    "Taylor Loop Entry": {
+      "main": [[{"node": "Build Taylor Prompt", "type": "main", "index": 0}]]
+    },
+    "Build Taylor Prompt": {
+      "main": [[{"node": "Taylor AI", "type": "main", "index": 0}]]
+    },
+    "Taylor AI": {
+      "main": [[{"node": "Parse Taylor Analysis", "type": "main", "index": 0}]]
+    },
+    "Parse Taylor Analysis": {
+      "main": [[{"node": "Create Taylor Review", "type": "main", "index": 0}]]
+    },
+    "Create Taylor Review": {
+      "main": [[{"node": "Wait Taylor Review", "type": "main", "index": 0}]]
+    },
+    "Wait Taylor Review": {
+      "main": [[{"node": "Process Taylor Decision", "type": "main", "index": 0}]]
+    },
+    "Process Taylor Decision": {
+      "main": [[{"node": "Route Taylor Decision", "type": "main", "index": 0}]]
+    },
+    "Route Taylor Decision": {
+      "main": [
+        [{"node": "Log to Google Sheets", "type": "main", "index": 0}],
+        [{"node": "Prep Back To Marcus", "type": "main", "index": 0}],
+        [{"node": "Prep Back To Sofia", "type": "main", "index": 0}]
+      ]
+    }
+  },
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "staticData": null,
+  "meta": {
+    "instanceId": "relay-hitl-pipeline"
   }
 }
