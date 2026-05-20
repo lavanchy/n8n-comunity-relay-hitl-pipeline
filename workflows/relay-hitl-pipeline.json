@@ -126,57 +126,13 @@
     },
     {
       "parameters": {
-        "mode": "manual",
-        "fields": {
-          "values": [
-            {
-              "name": "client_name",
-              "type": "string",
-              "stringValue": "={{ $json.Client }}"
-            },
-            {
-              "name": "platform",
-              "type": "string",
-              "stringValue": "={{ $json.Platform }}"
-            },
-            {
-              "name": "content_type",
-              "type": "string",
-              "stringValue": "={{ $json['Content Type'] }}"
-            },
-            {
-              "name": "topic_hint",
-              "type": "string",
-              "stringValue": "={{ $json['Topic Hint'] }}"
-            },
-            {
-              "name": "tone_note",
-              "type": "string",
-              "stringValue": "={{ $json['Tone Note'] || 'Professional and engaging' }}"
-            },
-            {
-              "name": "workflow_start_time",
-              "type": "string",
-              "stringValue": "={{ new Date().toISOString() }}"
-            },
-            {
-              "name": "brand_guide",
-              "type": "string",
-              "stringValue": "PASTE_FULL_CONTENT_OF_resources/loopin-brand-guide.md_HERE"
-            },
-            {
-              "name": "platform_playbook",
-              "type": "string",
-              "stringValue": "PASTE_FULL_CONTENT_OF_resources/relay-platform-playbook.md_HERE"
-            }
-          ]
-        },
-        "options": {}
+        "mode": "runOnceForAllItems",
+        "jsCode": "const d = $input.first().json;\nconst brand_guide = \"BRAND_GUIDE_INJECT_HERE\";\nconst platform_playbook = \"PLATFORM_PLAYBOOK_INJECT_HERE\";\nreturn [{ json: {\n  client_name:      d.Client       || d.client_name   || '',\n  platform:         d.Platform     || d.platform      || '',\n  content_type:     d['Content Type'] || d.content_type || '',\n  topic_hint:       d['Topic Hint']   || d.topic_hint   || '',\n  tone_note:        d['Tone Note']    || d.tone_note    || 'Professional and engaging',\n  workflow_start_time: new Date().toISOString(),\n  brand_guide,\n  platform_playbook\n}}];"
       },
       "id": "00000000-0000-0000-0000-000000000002",
       "name": "Load Client Context",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         240,
         304
@@ -780,7 +736,7 @@
           "mode": "list",
           "cachedResultName": "1. Sofia Review ({{SOFIA_TEMPLATE_ID}})"
         },
-        "reviewData": "={\n  \"client\": \"={{ $json.client_name }}\",\n  \"platform\": \"={{ $json.platform }}\",\n  \"content_type\": \"={{ $json.content_type }}\",\n  \"ai_angles\": \"={{ $json.sofia_angles }}\"\n}\n",
+        "reviewData": "={{ JSON.stringify({ client: $json.client_name, platform: $json.platform, content_type: $json.content_type, ai_angles: $json.sofia_angles }) }}",
         "additionalFields": {}
       },
       "type": "@gotohuman/n8n-nodes-gotohuman.gotoHuman",
@@ -807,7 +763,7 @@
           "mode": "list",
           "cachedResultName": "2: Marcus Review ({{MARCUS_TEMPLATE_ID}})"
         },
-        "reviewData": "={\n  \"angle\": \"={{ $json.approved_angle }}\",\n  \"post_copy\": \"={{ $json.post_copy }}\",\n  \"image_direction\": \"={{ $json.image_direction }}\",\n  \"taylor_preview\": \"={{ $json.taylor_preview_md }}\"\n}\n",
+        "reviewData": "={{ JSON.stringify({ angle: $json.approved_angle, post_copy: $json.post_copy, image_direction: $json.image_direction, taylor_preview: $json.taylor_preview_md }) }}",
         "additionalFields": {}
       },
       "type": "@gotohuman/n8n-nodes-gotohuman.gotoHuman",
@@ -834,7 +790,7 @@
           "mode": "list",
           "cachedResultName": "3: Taylor Review ({{TAYLOR_TEMPLATE_ID}})"
         },
-        "reviewData": "={\n  \"post_copy\": \"={{ $json.post_copy }}\",\n  \"image_direction\": \"={{ $json.image_direction }}\",\n  \"original_brief\": \"={{ $json.topic_hint }}\",\n  \"ai_summary\": \"={{ $json.ai_summary }}\",\n  \"ai_flags\": \"={{ $json.ai_flags }}\",\n  \"ai_recommendation\": \"={{ $json.ai_recommendation }}\"\n}\n",
+        "reviewData": "={{ JSON.stringify({ post_copy: $json.post_copy, image_direction: $json.image_direction, original_brief: $json.topic_hint, ai_summary: $json.ai_summary, ai_flags: $json.ai_flags, ai_recommendation: $json.ai_recommendation }) }}",
         "additionalFields": {}
       },
       "type": "@gotohuman/n8n-nodes-gotohuman.gotoHuman",
@@ -851,6 +807,37 @@
           "id": "{{GOTOHUMAN_CRED_ID}}",
           "name": "gotoHuman-n8n-HITL"
         }
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000037",
+      "name": "TEST – Manuell starten",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        560
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "relay-hitl-test",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "webhookId": "relay-hitl-test"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000038",
+      "name": "TEST – TB-01 Loopin LinkedIn",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        560
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "return [{ json: {\n  'Client':       'Loopin',\n  'Platform':     'LinkedIn',\n  'Content Type': 'Product announcement',\n  'Topic Hint':   'New Digest feature — AI compiles team video updates into a 5-min daily overview. Drive early access sign-ups to loopin.co/digest-early-access',\n  'Tone Note':    'Exciting, not corporate. Speak to managers with overflowing video queues.'\n}}];"
       }
     }
   ],
@@ -1218,6 +1205,28 @@
         [
           {
             "node": "Process Taylor Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TEST – Manuell starten": {
+      "main": [
+        [
+          {
+            "node": "TEST – TB-01 Loopin LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TEST – TB-01 Loopin LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Load Client Context",
             "type": "main",
             "index": 0
           }

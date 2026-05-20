@@ -32,15 +32,15 @@ def load_resource(filename):
     with open(path, encoding="utf-8") as f:
         return f.read()
 
-def set_string_value(nodes, node_name, field_name, value):
-    """Update a stringValue field in a Set node by node name."""
+def inject_into_code_node(nodes, node_name, placeholder, value):
+    """Replace a string placeholder inside a Code node's jsCode with a JSON-encoded value."""
     for node in nodes:
         if node.get("name") == node_name:
-            fields = node.get("parameters", {}).get("fields", {}).get("values", [])
-            for field in fields:
-                if field.get("name") == field_name:
-                    field["stringValue"] = value
-                    return True
+            code = node.get("parameters", {}).get("jsCode", "")
+            escaped = json.dumps(value)          # produces "content with \\n etc."
+            code = code.replace(f'"{placeholder}"', escaped)
+            node["parameters"]["jsCode"] = code
+            return True
     return False
 
 def substitute_placeholders(obj, substitutions):
@@ -64,9 +64,9 @@ def main():
     with open(wf_path, encoding="utf-8") as f:
         wf = json.load(f)
 
-    # Inject brand guide + playbook directly into parsed JSON (avoids escaping issues)
-    set_string_value(wf["nodes"], "Load Client Context", "brand_guide", brand_guide)
-    set_string_value(wf["nodes"], "Load Client Context", "platform_playbook", platform_playbook)
+    # Inject brand guide + playbook into Load Client Context Code node
+    inject_into_code_node(wf["nodes"], "Load Client Context", "BRAND_GUIDE_INJECT_HERE", brand_guide)
+    inject_into_code_node(wf["nodes"], "Load Client Context", "PLATFORM_PLAYBOOK_INJECT_HERE", platform_playbook)
 
     # Substitute credential/template placeholders throughout
     substitutions = {
