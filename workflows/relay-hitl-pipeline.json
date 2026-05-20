@@ -125,18 +125,18 @@
       "position": [1320, 300],
       "parameters": {
         "method": "POST",
-        "url": "https://api.gotohuman.com/v1/form-requests",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
+        "url": "https://api.gotohuman.com/v1/form-request",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "gotoHumanApi",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({\n  templateId: '{{SOFIA_TEMPLATE_ID}}',\n  callbackUrl: $execution.resumeUrl,\n  data: {\n    client: $json.client_name,\n    platform: $json.platform,\n    content_type: $json.content_type,\n    ai_angles: $json.content[0].text,\n    _ctx: JSON.stringify({\n      client_name: $json.client_name,\n      platform: $json.platform,\n      content_type: $json.content_type,\n      topic_hint: $json.topic_hint,\n      tone_note: $json.tone_note,\n      brand_guide: $json.brand_guide,\n      platform_playbook: $json.platform_playbook,\n      workflow_start_time: $json.workflow_start_time,\n      iterations_sofia: $json.iterations_sofia,\n      iterations_marcus: $json.iterations_marcus,\n      approved_angle: $json.approved_angle,\n      marcus_feedback: $json.marcus_feedback\n    })\n  }\n}) }}",
+        "jsonBody": "={{ JSON.stringify({\n  formType: '{{SOFIA_TEMPLATE_ID}}',\n  callbackUrl: $execution.resumeUrl,\n  data: {\n    client: $json.client_name,\n    platform: $json.platform,\n    content_type: $json.content_type,\n    ai_angles: $json.content[0].text,\n    _ctx: JSON.stringify({\n      client_name: $json.client_name,\n      platform: $json.platform,\n      content_type: $json.content_type,\n      topic_hint: $json.topic_hint,\n      tone_note: $json.tone_note,\n      brand_guide: $json.brand_guide,\n      platform_playbook: $json.platform_playbook,\n      workflow_start_time: $json.workflow_start_time,\n      iterations_sofia: $json.iterations_sofia,\n      iterations_marcus: $json.iterations_marcus,\n      approved_angle: $json.approved_angle,\n      marcus_feedback: $json.marcus_feedback\n    })\n  }\n}) }}",
         "options": {}
       },
       "credentials": {
-        "httpHeaderAuth": {
+        "gotoHumanApi": {
           "id": "{{GOTOHUMAN_CRED_ID}}",
-          "name": "gotoHuman API Key"
+          "name": "gotoHuman-n8n-HITL"
         }
       }
     },
@@ -319,18 +319,18 @@
       "position": [3740, 120],
       "parameters": {
         "method": "POST",
-        "url": "https://api.gotohuman.com/v1/form-requests",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
+        "url": "https://api.gotohuman.com/v1/form-request",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "gotoHumanApi",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({\n  templateId: '{{MARCUS_TEMPLATE_ID}}',\n  callbackUrl: $execution.resumeUrl,\n  data: {\n    angle: $json.approved_angle,\n    post_copy: $json.post_copy,\n    image_direction: $json.image_direction,\n    taylor_preview: $json.taylor_preview_md,\n    _ctx: JSON.stringify({\n      client_name: $json.client_name,\n      platform: $json.platform,\n      content_type: $json.content_type,\n      topic_hint: $json.topic_hint,\n      tone_note: $json.tone_note,\n      brand_guide: $json.brand_guide,\n      platform_playbook: $json.platform_playbook,\n      workflow_start_time: $json.workflow_start_time,\n      iterations_sofia: $json.iterations_sofia,\n      iterations_marcus: $json.iterations_marcus,\n      approved_angle: $json.approved_angle,\n      post_copy: $json.post_copy,\n      image_direction: $json.image_direction\n    })\n  }\n}) }}",
+        "jsonBody": "={{ JSON.stringify({\n  formType: '{{MARCUS_TEMPLATE_ID}}',\n  callbackUrl: $execution.resumeUrl,\n  data: {\n    angle: $json.approved_angle,\n    post_copy: $json.post_copy,\n    image_direction: $json.image_direction,\n    taylor_preview: $json.taylor_preview_md,\n    _ctx: JSON.stringify({\n      client_name: $json.client_name,\n      platform: $json.platform,\n      content_type: $json.content_type,\n      topic_hint: $json.topic_hint,\n      tone_note: $json.tone_note,\n      brand_guide: $json.brand_guide,\n      platform_playbook: $json.platform_playbook,\n      workflow_start_time: $json.workflow_start_time,\n      iterations_sofia: $json.iterations_sofia,\n      iterations_marcus: $json.iterations_marcus,\n      approved_angle: $json.approved_angle,\n      post_copy: $json.post_copy,\n      image_direction: $json.image_direction\n    })\n  }\n}) }}",
         "options": {}
       },
       "credentials": {
-        "httpHeaderAuth": {
+        "gotoHumanApi": {
           "id": "{{GOTOHUMAN_CRED_ID}}",
-          "name": "gotoHuman API Key"
+          "name": "gotoHuman-n8n-HITL"
         }
       }
     },
@@ -461,18 +461,18 @@
       "position": [5500, 120],
       "parameters": {
         "method": "POST",
-        "url": "https://api.gotohuman.com/v1/form-requests",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
+        "url": "https://api.gotohuman.com/v1/form-request",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "gotoHumanApi",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({\n  templateId: '{{TAYLOR_TEMPLATE_ID}}',\n  callbackUrl: $execution.resumeUrl,\n  data: {\n    post_copy: $json.post_copy,\n    image_direction: $json.image_direction,\n    original_brief: $json.topic_hint,\n    ai_summary: $json.ai_summary,\n    ai_flags: $json.ai_flags,\n    ai_recommendation: $json.ai_recommendation,\n    _ctx: JSON.stringify({\n      client_name: $json.client_name,\n      platform: $json.platform,\n      content_type: $json.content_type,\n      topic_hint: $json.topic_hint,\n      tone_note: $json.tone_note,\n      brand_guide: $json.brand_guide,\n      platform_playbook: $json.platform_playbook,\n      workflow_start_time: $json.workflow_start_time,\n      iterations_sofia: $json.iterations_sofia,\n      iterations_marcus: $json.iterations_marcus,\n      approved_angle: $json.approved_angle,\n      post_copy: $json.post_copy,\n      image_direction: $json.image_direction,\n      taylor_approval_round: ($json.taylor_approval_round || 0) + 1\n    })\n  }\n}) }}",
+        "jsonBody": "={{ JSON.stringify({\n  formType: '{{TAYLOR_TEMPLATE_ID}}',\n  callbackUrl: $execution.resumeUrl,\n  data: {\n    post_copy: $json.post_copy,\n    image_direction: $json.image_direction,\n    original_brief: $json.topic_hint,\n    ai_summary: $json.ai_summary,\n    ai_flags: $json.ai_flags,\n    ai_recommendation: $json.ai_recommendation,\n    _ctx: JSON.stringify({\n      client_name: $json.client_name,\n      platform: $json.platform,\n      content_type: $json.content_type,\n      topic_hint: $json.topic_hint,\n      tone_note: $json.tone_note,\n      brand_guide: $json.brand_guide,\n      platform_playbook: $json.platform_playbook,\n      workflow_start_time: $json.workflow_start_time,\n      iterations_sofia: $json.iterations_sofia,\n      iterations_marcus: $json.iterations_marcus,\n      approved_angle: $json.approved_angle,\n      post_copy: $json.post_copy,\n      image_direction: $json.image_direction,\n      taylor_approval_round: ($json.taylor_approval_round || 0) + 1\n    })\n  }\n}) }}",
         "options": {}
       },
       "credentials": {
-        "httpHeaderAuth": {
+        "gotoHumanApi": {
           "id": "{{GOTOHUMAN_CRED_ID}}",
-          "name": "gotoHuman API Key"
+          "name": "gotoHuman-n8n-HITL"
         }
       }
     },

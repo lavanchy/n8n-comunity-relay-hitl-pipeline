@@ -28,61 +28,56 @@ In n8n:
 
 ## Step 3: Create 3 Review Templates
 
-### Template 1: Sofia Review
+### Template IDs (bereits erstellt)
 
-**Fields to create in gotoHuman:**
+| Template | ID |
+|---|---|
+| Sofia Review | `wOkoABOpHs7PUkBmSHJB` |
+| Marcus Review | `W2o71eTDvvStzR7UBni6` |
+| Taylor Review | `tjekU1jyCHgH0cbaU5UO` |
 
-| Field name | Display label | Type |
-|---|---|---|
-| `client` | Client | Text |
-| `platform` | Platform | Text |
-| `content_type` | Content Type | Text |
-| `ai_angles` | Proposed Angles | Markdown |
-| `sofia_decision` | Decision | Dropdown |
-| `sofia_notes` | Revision Notes | Text |
+---
 
-**Dropdown options for `sofia_decision`:**
-- `Approve: Angle 1`
-- `Approve: Angle 2`
-- `Approve: Angle 3`
-- `Revise`
+### Template 1: Sofia Review (`wOkoABOpHs7PUkBmSHJB`)
 
-### Template 2: Marcus Review
+**Fields:**
 
-**Fields to create in gotoHuman:**
+| Field name | Display label | Typ | Read-only? | Hinweis |
+|---|---|---|---|---|
+| `client` | Client | Short text | ✅ Read-only | Wird vom Workflow befüllt |
+| `platform` | Platform | Short text | ✅ Read-only | Wird vom Workflow befüllt |
+| `content_type` | Content Type | Short text | ✅ Read-only | Wird vom Workflow befüllt |
+| `ai_angles` | Proposed Angles | Long text / Markdown | ✅ Read-only | Sofia's 3 Winkel — Reviewer liest nur |
+| `sofia_decision` | Decision | Dropdown | ❌ Reviewer wählt | Optionen: `Approve: Angle 1`, `Approve: Angle 2`, `Approve: Angle 3`, `Revise` |
+| `sofia_notes` | Revision Notes | Long text | ❌ Reviewer schreibt | Nur ausfüllen wenn Revise gewählt |
 
-| Field name | Display label | Type |
-|---|---|---|
-| `angle` | Approved Angle | Text |
-| `post_copy` | Post Copy | Markdown |
-| `image_direction` | Image Direction | Markdown |
-| `taylor_preview` | Taylor's Preview | Markdown |
-| `marcus_decision` | Decision | Dropdown |
-| `marcus_notes` | Edit Notes | Text |
+### Template 2: Marcus Review (`W2o71eTDvvStzR7UBni6`)
 
-**Dropdown options for `marcus_decision`:**
-- `Send to Taylor`
-- `Edit & Regenerate`
+**Fields:**
 
-### Template 3: Taylor Review
+| Field name | Display label | Typ | Read-only? | Hinweis |
+|---|---|---|---|---|
+| `angle` | Approved Angle | Short text | ✅ Read-only | Der von Sofia genehmigte Winkel |
+| `post_copy` | Post Copy | Long text / Markdown | ✅ Read-only | Marcus' Post-Text |
+| `image_direction` | Image Direction | Long text / Markdown | ✅ Read-only | Marcus' Bildbeschreibung |
+| `taylor_preview` | Taylor Preview (AI) | Long text / Markdown | ✅ Read-only | KI-Vorschau was Taylor sehen wird |
+| `marcus_decision` | Decision | Dropdown | ❌ Reviewer wählt | Optionen: `Send to Taylor`, `Edit & Regenerate` |
+| `marcus_notes` | Edit Notes | Long text | ❌ Reviewer schreibt | Nur ausfüllen wenn Edit & Regenerate |
 
-**Fields to create in gotoHuman:**
+### Template 3: Taylor Review (`tjekU1jyCHgH0cbaU5UO`)
 
-| Field name | Display label | Type |
-|---|---|---|
-| `post_copy` | Post Copy | Markdown |
-| `image_direction` | Image Direction | Markdown |
-| `original_brief` | Original Brief | Text |
-| `ai_summary` | AI Summary | Markdown |
-| `ai_flags` | Quality Flags | Markdown |
-| `ai_recommendation` | AI Recommendation | Text |
-| `taylor_decision` | Decision | Dropdown |
-| `taylor_notes` | Feedback Notes | Text |
+**Fields:**
 
-**Dropdown options for `taylor_decision`:**
-- `Approve`
-- `Back to Marcus`
-- `Back to Sofia`
+| Field name | Display label | Typ | Read-only? | Hinweis |
+|---|---|---|---|---|
+| `post_copy` | Post Copy | Long text / Markdown | ✅ Read-only | Finaler Post-Text |
+| `image_direction` | Image Direction | Long text / Markdown | ✅ Read-only | Bildbeschreibung |
+| `original_brief` | Original Brief | Long text | ✅ Read-only | Topic Hint aus dem Intake-Formular |
+| `ai_summary` | AI Summary | Long text / Markdown | ✅ Read-only | Taylor's KI-Zusammenfassung |
+| `ai_flags` | Quality Flags | Long text / Markdown | ✅ Read-only | Liste der KI-Qualitätshinweise |
+| `ai_recommendation` | AI Recommendation | Short text | ✅ Read-only | approve / needs_revision / reject_to_sofia |
+| `taylor_decision` | Decision | Dropdown | ❌ Reviewer wählt | Optionen: `Approve`, `Back to Marcus`, `Back to Sofia` |
+| `taylor_notes` | Feedback Notes | Long text | ❌ Reviewer schreibt | Feedback für die Revision |
 
 ---
 
